@@ -48,6 +48,10 @@ namespace Dao.Net {
         }
 
         protected virtual string[] GetFiles(string path) {
+            if (string.IsNullOrEmpty( path )) {
+                return DriveInfo.GetDrives().Select(x => x.Name)
+                      .ToArray();
+            }
             return Directory.GetFileSystemEntries(path);
         }
 

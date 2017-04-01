@@ -20,7 +20,6 @@ namespace Dao.Net.Client {
         private async void Start() {
             MySocketClient client = new MySocketClient();
 
-
             await client.ConnectAsync("127.0.0.1", 1234);
 
             fileManager = client.FileManager;
@@ -43,11 +42,18 @@ namespace Dao.Net.Client {
         }
 
         private void button1_Click(object sender, EventArgs e) {
-            fileManager.GetFilesAsync(@"C:/");
+            fileManager.GetFilesAsync(textBox1.Text);
         }
 
         private void button2_Click(object sender, EventArgs e) {
+
             userManager.LoginAsync("", "");
+        }
+
+        private void listBox1_DoubleClick(object sender, EventArgs e) {
+            string path = listBox1.SelectedItem as string;
+            textBox1.Text = path;
+            fileManager.GetFilesAsync(path);
         }
     }
 }
