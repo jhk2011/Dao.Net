@@ -70,6 +70,7 @@ namespace Dao.Net {
                 packet = await ReceiveAsync();
             } catch (Exception ex) {
                 Console.WriteLine("Receive Error:{0}", ex.Message);
+                Console.WriteLine(ex.StackTrace);
                 OnClosed();
             }
             if (packet != null) {

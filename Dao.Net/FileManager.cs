@@ -9,7 +9,7 @@ namespace Dao.Net {
         public string Name { get; set; }
         public string FullName { get; set; }
         public int Size { get; set; }
-        public bool Directory { get; set; }
+        public bool IsDirectory { get; set; }
     }
 
     public class FileManager : ISocketHandler {
@@ -24,10 +24,6 @@ namespace Dao.Net {
             packet.SetString(path);
 
             _session.SendAsync(packet);
-        }
-
-        private SocketSession FindSession(string userid) {
-            throw new NotImplementedException();
         }
 
         public void Handle(Packet packet, SocketSession session) {

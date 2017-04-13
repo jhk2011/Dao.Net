@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Calc.cs" />
     <Compile Include="MyServerHandler.cs" />
     <Compile Include="MyServerSession.cs" />
     <Compile Include="MySocketListener.cs" />

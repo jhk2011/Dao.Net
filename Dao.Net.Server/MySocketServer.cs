@@ -12,7 +12,7 @@ namespace Dao.Net.Server {
         }
 
         protected override SocketSession GetSocketSession(Socket client) {
-            return new MyServerSession(client);
+            return new MyServerSession(client, this);
         }
 
         protected override void OnAccepted(SocketSession session) {

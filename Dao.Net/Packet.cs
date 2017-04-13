@@ -11,6 +11,8 @@ namespace Dao.Net {
     public class UserPackets {
         public const int Login = 2001;
         public const int LoginReply = 2002;
+        public const int GetUsers = 2003;
+        public const int GetUsersReply = 2004;
     }
     public class FilePackets {
         public const int GetFiles = 1001;
@@ -22,6 +24,10 @@ namespace Dao.Net {
         public static readonly byte[] EmptyBuffer = new byte[0];
 
         public Guid Id { get; set; }
+
+        public string ScrUserId { get; set; }
+
+        public string DestUserId { get; set; }
 
         public Packet(int type, byte[] buffer) {
             _type = type;
