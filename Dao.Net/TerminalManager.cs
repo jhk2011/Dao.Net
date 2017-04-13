@@ -11,7 +11,7 @@ namespace Dao.Net {
     }
 
     [Serializable]
-    public class TerminalInfo : Base {
+    public class TerminalInfo {
         public string Command { get; set; }
     }
 
@@ -55,6 +55,7 @@ namespace Dao.Net {
 
             p.ScrUserId = Session.Handlers.GetHandler<UserManager>().UserId;
             p.DestUserId = userid;
+
             TerminalInfo info = new TerminalInfo {
                 Command = command
             };
@@ -67,44 +68,37 @@ namespace Dao.Net {
             Session.SendAsync(p);
         }
 
+        public void InitAsync() {
+            Packet p = new Packet(TerminalPackets.Init);
+            Session.SendAsync(p);
+        }
+
+        public void CloseAsync() {
+            Packet p = new Packet(TerminalPackets.Close);
+            Session.SendAsync(p);
+        }
+
         public event Action<String> Received;
 
         public event Action<String> Error;
 
-        Terminal terminal = null;
-        public void Execute(string command) {
-
-            if (terminal == null) {
-                terminal = new Terminal();
-                terminal.Received += Terminal_Received;
-                terminal.Error += Terminal_Error;
-            }
-            terminal.Execute(command);
-        }
 
         public void Cancel() {
-            terminal.Cancel();
-        }
-        private void Terminal_Error(string obj) {
-            Packet p = new Packet(TerminalPackets.Error);
-            p.SetString(obj);
-            Session.SendAsync(p);
-        }
 
-        private void Terminal_Received(string obj) {
-            Packet p = new Packet(TerminalPackets.Receive);
-            p.SetString(obj);
-            Session.SendAsync(p);
         }
 
         public void Handle(Packet packet, SocketSession session) {
             if (packet.Type == TerminalPackets.Execute) {
-                TerminalInfo info = packet.GetObject<TerminalInfo>();
-                //Execute(info.Command);
-                Execute(info,packet.ScrUserId,packet.DestUserId);
+                Execute(packet);
+            }
+            if (packet.Type == TerminalPackets.Init) {
+                Init(packet);
             }
             if (packet.Type == TerminalPackets.Cancel) {
                 Cancel();
+            }
+            if (packet.Type == TerminalPackets.Close) {
+                Close(packet);
             }
             if (packet.Type == TerminalPackets.Receive) {
                 Received?.Invoke(packet.GetString());
@@ -114,20 +108,34 @@ namespace Dao.Net {
             }
         }
 
-        private void Execute(TerminalInfo info,string src,string dest) {
+        private void Close(Packet packet) {
+            NewMethod(packet).Close(packet);
+        }
+
+        private void Init(Packet packet) {
+            NewMethod(packet).Init(packet);
+        }
+
+        private void Execute(Packet packet) {
+            TerminalManager2 manager = NewMethod(packet);
+            manager.Execute(packet);
+        }
+
+        private TerminalManager2 NewMethod(Packet packet) {
             var manager = managers
-                .Where(x => x.DestUserId == info.DestUserId)
+                .Where(x => x.DestUserId == packet.DestUserId)
                 .FirstOrDefault();
 
             if (manager == null) {
                 manager = new TerminalManager2 {
-                    SrcUserId = dest,
-                    DestUserId = src,
+                    SrcUserId = packet.ScrUserId,
+                    DestUserId = packet.DestUserId,
                     Session = this.Session
                 };
                 managers.Add(manager);
             }
-            manager.Execute(info.Command);
+
+            return manager;
         }
     }
 
@@ -138,30 +146,42 @@ namespace Dao.Net {
 
         public SocketSession Session { get; set; }
 
-        Terminal terminal = null;
-        public void Execute(string command) {
-            if (terminal == null) {
-                terminal = new Terminal();
-                terminal.Received += Terminal_Received;
-                terminal.Error += Terminal_Error;
-            }
-            terminal.Execute(command);
+        Terminal terminal = new Terminal();
+
+        public void Init(Packet packet) {
+            terminal.Received += Terminal_Received;
+            terminal.Error += Terminal_Error;
+            terminal.Init();
+        }
+
+        public void Execute(Packet packet) {
+            var info = packet.GetObject<TerminalInfo>();
+            //if (terminal == null) {
+            //    terminal = new Terminal();
+            //    terminal.Received += Terminal_Received;
+            //    terminal.Error += Terminal_Error;
+            //}
+            terminal.Execute(info.Command);
         }
 
         private void Terminal_Error(string obj) {
             Packet p = new Packet(TerminalPackets.Error);
             p.SetString(obj);
-            p.ScrUserId = SrcUserId;
-            p.DestUserId = DestUserId;
+            p.ScrUserId = DestUserId;
+            p.DestUserId = SrcUserId;
             Session.SendAsync(p);
         }
 
         private void Terminal_Received(string obj) {
             Packet p = new Packet(TerminalPackets.Receive);
             p.SetString(obj);
-            p.ScrUserId = SrcUserId;
-            p.DestUserId = DestUserId;
+            p.ScrUserId = DestUserId;
+            p.DestUserId = SrcUserId;
             Session.SendAsync(p);
+        }
+
+        internal void Close(Packet packet) {
+            terminal.Close();
         }
     }
 }

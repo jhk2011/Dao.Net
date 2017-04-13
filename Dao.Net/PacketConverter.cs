@@ -42,7 +42,9 @@ namespace Dao.Net {
                 packet.Buffer = buffer;
             }
 
-            Console.WriteLine("Receive:{0}", type);
+            Console.WriteLine("Receive:{0}->{1} {2}",
+                packet.ScrUserId ?? "[null]",
+                packet.DestUserId ?? "[null]", type);
 
             return packet;
         }
@@ -52,6 +54,8 @@ namespace Dao.Net {
 
             int length2 = BitConverter.ToInt32(buffer2, 0);
 
+            if (length2 == 0) return null;
+
             byte[] buffer3 = await session.Socket.ReceiveAllAsync(length2);
 
             return Encoding.UTF8.GetString(buffer3);
@@ -60,7 +64,9 @@ namespace Dao.Net {
         public async Task SendAsync(SocketSession session, Packet packet) {
             if (packet == null) throw new ArgumentNullException("buffer");
 
-            Console.WriteLine("Send:{0}", packet.Type);
+            Console.WriteLine("Send:{0}->{1} {2}", 
+                packet.ScrUserId??"[null]",
+                packet.DestUserId ?? "[null]", packet.Type);
 
             using (MemoryStream ms = new MemoryStream()) {
                 var buffer = packet.Buffer;

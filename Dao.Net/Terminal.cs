@@ -74,8 +74,10 @@ namespace Dao.Net {
 
 
     class Terminal {
+
         Process process;
-        public Terminal() {
+
+        public void Init() {
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = "cmd.exe";
             startInfo.CreateNoWindow = true;
@@ -94,20 +96,20 @@ namespace Dao.Net {
 
             Task.Factory.StartNew(() => {
                 BinaryReader reader = new BinaryReader(
-                    process.StandardOutput.BaseStream,Encoding.Default);
-                while (true) {
+                    process.StandardOutput.BaseStream, Encoding.Default);
+                while (!process.StandardOutput.EndOfStream) {
 
                     char ch = reader.ReadChar();
                     Received?.Invoke(ch.ToString());
 
                     //string s = process.StandardOutput.ReadLine();
-                       
+
                     //Received?.Invoke(s);
                 }
             });
 
             Task.Factory.StartNew(() => {
-                while (true) {
+                while (!process.StandardOutput.EndOfStream) {
                     string s = process.StandardError.ReadLine();
                     Error?.Invoke(s);
                 }
@@ -117,7 +119,6 @@ namespace Dao.Net {
             //process.OutputDataReceived += Process_OutputDataReceived;
             //process.BeginOutputReadLine();
             //process.BeginErrorReadLine();
-
         }
 
         public void Execute(string commad) {
@@ -140,6 +141,11 @@ namespace Dao.Net {
         private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e) {
             Error?.Invoke(e.Data);
         }
+
+        internal void Close() {
+            process.Kill();
+            process = null;
+        }
     }
 
     class TerminalPackets {
@@ -147,5 +153,7 @@ namespace Dao.Net {
         public const int Receive = 5002;
         public const int Error = 5003;
         public const int Cancel = 5004;
+        public const int Init = 5005;
+        public const int Close = 5006;
     }
 }

@@ -23,6 +23,7 @@ namespace Dao.Net.Client {
             TerminalManager = client.TerminalManager;
             TerminalManager.Error += TerminalManager_Error;
             TerminalManager.Received += TerminalManager_Received;
+            TerminalManager.InitAsync();
         }
 
         private void TerminalManager_Received(string obj) {
@@ -34,11 +35,16 @@ namespace Dao.Net.Client {
         }
 
         private void button1_Click(object sender, EventArgs e) {
-            TerminalManager.ExecuteAsync(textBox1.Text + Environment.NewLine,"a");
+            TerminalManager.ExecuteAsync(textBox1.Text + Environment.NewLine,null);
         }
 
         private void button2_Click(object sender, EventArgs e) {
             TerminalManager.CancelAsync();
+        }
+
+        protected override void OnClosed(EventArgs e) {
+            base.OnClosed(e);
+            TerminalManager.CloseAsync();
         }
     }
 }
