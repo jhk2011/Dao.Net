@@ -9,6 +9,7 @@ namespace Dao.Net {
     [Serializable]
     public class BreakException : Exception {
         public BreakException() { }
+
         public BreakException(string message) : base(message) { }
         public BreakException(string message, Exception inner) : base(message, inner) { }
         protected BreakException(
