@@ -12,6 +12,7 @@ namespace Dao.Net {
         public bool IsDirectory { get; set; }
     }
 
+
     public class FileManager : ISocketHandler {
 
         SocketSession _session;
