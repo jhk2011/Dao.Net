@@ -73,7 +73,7 @@ namespace Dao.Net {
     }
 
 
-    class Terminal {
+    public class Terminal {
 
         Process process;
 
@@ -106,6 +106,7 @@ namespace Dao.Net {
 
                     //Received?.Invoke(s);
                 }
+                Console.WriteLine("Task Complete");
             });
 
             Task.Factory.StartNew(() => {
@@ -142,7 +143,7 @@ namespace Dao.Net {
             Error?.Invoke(e.Data);
         }
 
-        internal void Close() {
+        public void Close() {
             process.Kill();
             process = null;
         }

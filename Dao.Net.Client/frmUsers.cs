@@ -21,7 +21,7 @@ namespace Dao.Net.Client {
         internal void Init(MySocketClient client) {
             _client = client;
             userManager = _client.UserManager;
-            userManager.GetUsersCompleted += UserManager_GetUsersCompleted;
+            userManager.GetUsers += UserManager_GetUsersCompleted;
         }
 
         private void UserManager_GetUsersCompleted(List<string> obj) {
@@ -29,11 +29,26 @@ namespace Dao.Net.Client {
         }
 
         private void button1_Click(object sender, EventArgs e) {
-            userManager.LoginAsync(textBox1.Text, "");
+            userManager.Join += UserManager_Join;
+            userManager.JoinAsync(textBox1.Text, "");
+        }
+
+        private void UserManager_Join(JoinReply obj) {
+            if (obj.Code == 0) {
+                Console.WriteLine("Join success");
+            }
         }
 
         private void button2_Click(object sender, EventArgs e) {
             userManager.GetUserAsync();
+        }
+
+        private void button3_Click(object sender, EventArgs e) {
+            frmTerminal frm = new frmTerminal();
+            string user = listBox1.SelectedItem as string;
+            ClientSocketSession session = _client.GetSession(user);
+            frm.Init(session);
+            frm.ShowDialog();
         }
     }
 }

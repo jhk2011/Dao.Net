@@ -16,11 +16,10 @@ namespace Dao.Net.Client {
 
         internal MySocketClient Client { get; set; }
 
-        public TerminalManager TerminalManager { get; set; }
+        public TerminalClientManager TerminalManager { get; set; }
+        public string UserId { get; internal set; }
 
-        internal void Init(MySocketClient client) {
-            Client = client;
-            TerminalManager = client.TerminalManager;
+        internal void Init() {
             TerminalManager.Error += TerminalManager_Error;
             TerminalManager.Received += TerminalManager_Received;
             TerminalManager.InitAsync();
@@ -35,7 +34,7 @@ namespace Dao.Net.Client {
         }
 
         private void button1_Click(object sender, EventArgs e) {
-            TerminalManager.ExecuteAsync(textBox1.Text + Environment.NewLine,null);
+            TerminalManager.ExecuteAsync(textBox1.Text + Environment.NewLine);
         }
 
         private void button2_Click(object sender, EventArgs e) {
@@ -45,6 +44,16 @@ namespace Dao.Net.Client {
         protected override void OnClosed(EventArgs e) {
             base.OnClosed(e);
             TerminalManager.CloseAsync();
+            TerminalManager.Error -= TerminalManager_Error;
+            TerminalManager.Received -= TerminalManager_Received;
+            TerminalManager.InitAsync();
+        }
+
+        ClientSocketSession session;
+        internal void Init(ClientSocketSession session) {
+            this.session = session;
+            TerminalManager = session.TerminalManager;
+            Init();
         }
     }
 }

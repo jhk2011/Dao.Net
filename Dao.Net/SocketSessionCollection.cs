@@ -42,6 +42,12 @@ namespace Dao.Net
             }
         }
 
+        public void Broadcast(Packet packet) {
+            foreach (var item in this) {
+                item.SendAsync(packet);
+            }
+        }
+
     }
 
 }

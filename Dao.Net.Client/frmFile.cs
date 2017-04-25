@@ -26,15 +26,13 @@ namespace Dao.Net.Client {
             userManager = client.UserManager;
 
             fileManager.GetFilesComplete += fileManager_ReceiveFiles;
-            userManager.LoginCompleted += UserManager_LoginCompleted;
+            userManager.Join += UserManager_LoginCompleted;
 
             client.StartReceive();
         }
 
-        private void UserManager_LoginCompleted(bool obj) {
-            if (obj) {
-                MessageBox.Show("登录成功");
-            }
+        private void UserManager_LoginCompleted(JoinReply obj) {
+            Console.WriteLine(obj.Code == 0);
         }
 
         private void fileManager_ReceiveFiles(string[] obj) {
@@ -47,7 +45,7 @@ namespace Dao.Net.Client {
 
         private void button2_Click(object sender, EventArgs e) {
 
-            userManager.LoginAsync("", "");
+            userManager.JoinAsync("", "");
         }
 
         private void listBox1_DoubleClick(object sender, EventArgs e) {

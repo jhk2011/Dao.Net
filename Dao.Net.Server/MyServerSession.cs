@@ -8,23 +8,30 @@ namespace Dao.Net.Server {
         public MyServerSession(Socket socket, MySocketServer server) : base(socket) {
             Server = server;
             this.Handlers = new PacketHandlerCollection();
+
+            Handlers.Add(new UserManager {
+                Server = server,
+                Session = this
+            });
+
             Handlers.Add(new TransferManager() {
                 Server = server
             });
-            Handlers.Add(new MyServerHandler());
-            Handlers.Add(new UserManager() {
-                Session = this,
-                Server = server
-            });
-            Handlers.Add(new FileManager(this));
-            Handlers.Add(new TerminalManager { Session = this });
 
-            ServiceManager h = new ServiceManager();
+            //Handlers.Add(new MyServerHandler());
+            //Handlers.Add(new UserManager() {
+            //    Session = this,
+            //    Server = server
+            //});
+            //Handlers.Add(new FileManager(this));
+            //Handlers.Add(new TerminalServerManager { Session = this });
 
-            h.AddService("calc", new Calc());
-            h.Session = this;
+            //ServiceManager h = new ServiceManager();
 
-            Handlers.Add(h);
+            //h.AddService("calc", new Calc());
+            //h.Session = this;
+
+            //Handlers.Add(h);
         }
 
         protected override void OnReceived(Packet packet) {

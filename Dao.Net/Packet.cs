@@ -8,9 +8,17 @@ using System.Text;
 
 namespace Dao.Net {
 
+    public class SysPackets {
+        public const int Join = 100;
+        public const int Leave = 101;
+        public const int List = 102;
+    }
+
     public class UserPackets {
-        public const int Login = 2001;
-        public const int LoginReply = 2002;
+        public const int Join = 2001;
+        public const int JoinReply = 2002;
+        public const int Leave = 2005;
+        public const int LeaveReply = 2005;
         public const int GetUsers = 2003;
         public const int GetUsersReply = 2004;
     }

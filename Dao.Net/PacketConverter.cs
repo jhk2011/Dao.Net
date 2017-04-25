@@ -25,22 +25,20 @@ namespace Dao.Net {
 
             packet.Type = type;
 
-            if (length != 0) {
-
-                if (length < 0) {
-                    throw new InvalidOperationException("接收的到的长度错误");
-                }
-                if (length > 10 * 1024 * 1024) {
-                    throw new InvalidOperationException("接收到的长度超过限制");
-                }
-
-                packet.ScrUserId = await ReadString(session);
-                packet.DestUserId= await ReadString(session);
-    
-                buffer = await session.Socket.ReceiveAllAsync(length);
-
-                packet.Buffer = buffer;
+            if (length < 0) {
+                throw new InvalidOperationException("接收的到的长度错误");
             }
+            if (length > 10 * 1024 * 1024) {
+                throw new InvalidOperationException("接收到的长度超过限制");
+            }
+
+            packet.ScrUserId = await ReadString(session);
+            packet.DestUserId = await ReadString(session);
+
+
+            buffer = await session.Socket.ReceiveAllAsync(length);
+
+            packet.Buffer = buffer;
 
             Console.WriteLine("Receive:{0}->{1} {2}",
                 packet.ScrUserId ?? "[null]",
@@ -64,8 +62,8 @@ namespace Dao.Net {
         public async Task SendAsync(SocketSession session, Packet packet) {
             if (packet == null) throw new ArgumentNullException("buffer");
 
-            Console.WriteLine("Send:{0}->{1} {2}", 
-                packet.ScrUserId??"[null]",
+            Console.WriteLine("Send:{0}->{1} {2}",
+                packet.ScrUserId ?? "[null]",
                 packet.DestUserId ?? "[null]", packet.Type);
 
             using (MemoryStream ms = new MemoryStream()) {
@@ -83,7 +81,7 @@ namespace Dao.Net {
             }
         }
 
-        private static void WriteString(MemoryStream ms,string s) {
+        private static void WriteString(MemoryStream ms, string s) {
             var buffer3 = s == null ? Packet.EmptyBuffer :
                 Encoding.UTF8.GetBytes(s);
 

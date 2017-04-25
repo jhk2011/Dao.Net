@@ -5,58 +5,83 @@ using System.Linq;
 namespace Dao.Net {
 
     [Serializable]
-    public class UserLoginInfo {
-        public string UserId { get; set; }
+    public class JoinInfo {
+        public string UserName { get; set; }
         public string Password { get; set; }
     }
 
+    [Serializable]
+    public class JoinReply {
+        public int Code { get; set; }
+        public string Message { get; set; }
+    }
+
+    [Serializable]
+    public class LeaveReply {
+        public int Code { get; set; }
+        public string Message { get; set; }
+    }
+
     public class UserManager : ISocketHandler {
+        public string UserName { get; set; }
 
         public SocketSession Session { get; set; }
         public SocketServer Server { get; set; }
 
-        public string UserId { get; set; }
-
         void ISocketHandler.Handle(Packet packet, SocketSession session) {
-            if (packet.Type == UserPackets.Login) {
-                var user = packet.GetObject<UserLoginInfo>();
-                var result = Login(user);
-                if (result) {
-                    UserId = user.UserId;
+            if (packet.Type == UserPackets.Join) {
+                var user = packet.GetObject<JoinInfo>();
+                var result = DoJoin(user);
+                if (result.Code == 0) {
+                    UserName = user.UserName;
                 }
-                Packet reply = new Packet(UserPackets.LoginReply);
+                Packet reply = new Packet(UserPackets.JoinReply);
                 reply.SetObject(result);
                 session.SendAsync(reply);
-            } else if (packet.Type == UserPackets.LoginReply) {
-                bool value = packet.GetObject<bool>();
-                OnLoginCompleted(value);
-            } else if (packet.Type == UserPackets.GetUsers) {
-                var users = GetUsers();
-                Packet reply = new Packet(UserPackets.GetUsersReply);
-                reply.SetObject(users);
+            } else if (packet.Type == UserPackets.JoinReply) {
+                JoinReply reply = packet.GetObject<JoinReply>();
+
+                Join?.Invoke(reply);
+
+            }
+            if (packet.Type == UserPackets.Leave) {
+                Packet reply = new Packet(UserPackets.LeaveReply);
                 session.SendAsync(reply);
+            } else if (packet.Type == UserPackets.LeaveReply) {
+                LeaveReply obj = new LeaveReply();
+                Leave?.Invoke(obj);
+            } else if (packet.Type == UserPackets.GetUsers) {
+
+                var users = DoGetUsers();
+                Packet reply = new Packet(UserPackets.GetUsersReply);
+
+                reply.SetObject(users);
+
+                session.SendAsync(reply);
+
             } else if (packet.Type == UserPackets.GetUsersReply) {
-                GetUsersCompleted?.Invoke(packet.GetObject<List<String>>());
+                GetUsers?.Invoke(packet.GetObject<List<String>>());
             }
         }
 
-        private void OnLoginCompleted(bool value) {
-            if (value) {
-                UserId = LastUserId;
-            }
-            LoginCompleted?.Invoke(value);
-        }
+        public event Action<JoinReply> Join;
 
-        public event Action<List<String>> GetUsersCompleted;
+        public event Action<LeaveReply> Leave;
 
-        public string LastUserId { get; set; }
-        public void LoginAsync(string userid, string password) {
-            LastUserId = userid;
-            Packet packet = new Packet(UserPackets.Login);
-            packet.SetObject(new UserLoginInfo() {
-                UserId = userid,
+        public event Action<List<String>> GetUsers;
+
+        public void JoinAsync(string username, string password) {
+            UserName = username;
+            Packet packet = new Packet(UserPackets.Join);
+            packet.SetObject(new JoinInfo() {
+                UserName = username,
                 Password = password
             });
+            Session.SendAsync(packet);
+        }
+
+        public void LeaveAsync() {
+            Packet packet = new Packet(UserPackets.Leave);
             Session.SendAsync(packet);
         }
 
@@ -65,19 +90,22 @@ namespace Dao.Net {
             Session.SendAsync(p);
         }
 
-        public List<string> GetUsers() {
+
+        public List<string> DoGetUsers() {
             return Server.Sessions
-                .Select(x => x.Handlers
-                    .OfType<UserManager>()
-                    .FirstOrDefault())
-                .Select(x => x.UserId)
-                .ToList();
+               .Select(x => x.Handlers
+                   .OfType<UserManager>()
+                   .FirstOrDefault())
+               .Select(x => x.UserName)
+               .ToList();
         }
 
-        public event Action<bool> LoginCompleted;
 
-        protected bool Login(UserLoginInfo user) {
-            return true;
+        protected JoinReply DoJoin(JoinInfo user) {
+            return new JoinReply {
+                Code = 0,
+                Message = "成功"
+            };
         }
     }
 }

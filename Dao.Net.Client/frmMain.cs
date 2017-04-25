@@ -21,8 +21,9 @@ namespace Dao.Net.Client {
             try {
                 textBox1.Text = File.ReadAllText("ip.txt");
             } catch {
-
+                
             }
+            Start();
         }
 
         protected override void OnClosed(EventArgs e) {
@@ -48,9 +49,7 @@ namespace Dao.Net.Client {
         }
 
         private void button2_Click(object sender, EventArgs e) {
-            frmTerminal dlg = new frmTerminal();
-            dlg.Init(client);
-            dlg.ShowDialog(this);
+
         }
 
         private void button3_Click(object sender, EventArgs e) {

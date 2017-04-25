@@ -61,8 +61,12 @@
     <Compile Include="SocketServer.cs" />
     <Compile Include="SocketSession.cs" />
     <Compile Include="SocketSessionCollection.cs" />
+    <Compile Include="SystemManager.cs" />
     <Compile Include="Terminal.cs" />
-    <Compile Include="TerminalManager.cs" />
+    <Compile Include="TerminalClientManager.cs" />
+    <Compile Include="TerminalManager2.cs" />
+    <Compile Include="TerminalServerManager.cs" />
+    <Compile Include="TransferManager.cs" />
     <Compile Include="UserManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
