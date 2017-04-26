@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,46 +13,44 @@ namespace Dao.Net.Client {
     public partial class frmFile : Form {
         public frmFile() {
             InitializeComponent();
-            Start();
         }
 
-        FileManager fileManager;
-        UserManager userManager;
-        private async void Start() {
-            MySocketClient client = new MySocketClient();
+        IFileService fileService;
 
-            await client.ConnectAsync("127.0.0.1", 1234);
-
-            fileManager = client.FileManager;
-            userManager = client.UserManager;
-
-            fileManager.GetFilesComplete += fileManager_ReceiveFiles;
-            userManager.Join += UserManager_LoginCompleted;
-
-            client.StartReceive();
-        }
-
-        private void UserManager_LoginCompleted(JoinReply obj) {
-            Console.WriteLine(obj.Code == 0);
-        }
-
-        private void fileManager_ReceiveFiles(string[] obj) {
-            listBox1.DataSource = obj;
+        internal void Init(MySocketClient client, string userid) {
+            ServiceManager serviceManager = client.Handlers.GetHandler<ServiceManager>();
+            fileService = serviceManager.GetServiceProxy<IFileService>("file", userid);
         }
 
         private void button1_Click(object sender, EventArgs e) {
-            fileManager.GetFilesAsync(textBox1.Text);
+            string path = textBox1.Text;
+            Go(path);
+        }
+
+        private async void Go(string path) {
+            listBox1.DisplayMember = "FullName";
+
+            var files= await Task.Factory
+                .StartNew(() => fileService.GetFileItem(path));
+
+            if (files != null) {
+                listBox1.DataSource = files;
+                textBox1.Text = path;
+            }
         }
 
         private void button2_Click(object sender, EventArgs e) {
-
-            userManager.JoinAsync("", "");
+            DirectoryInfo di = new DirectoryInfo(textBox1.Text);
+            if (di.Parent != null) {
+                Go(di.Parent.FullName);
+            } else {
+                Go(null);
+            }
         }
 
         private void listBox1_DoubleClick(object sender, EventArgs e) {
-            string path = listBox1.SelectedItem as string;
-            textBox1.Text = path;
-            fileManager.GetFilesAsync(path);
+            var f = listBox1.SelectedItem as FileItem;
+            Go(f?.FullName);
         }
     }
 }

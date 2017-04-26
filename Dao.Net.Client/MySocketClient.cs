@@ -54,24 +54,9 @@ namespace Dao.Net.Client {
 
         }
 
-        List<ClientSocketSession> sessions = new List<ClientSocketSession>();
-
-        public virtual ClientSocketSession GetSession(string obj) {
-            var session = new ClientSocketSession(this.Socket) {
-                DestUserId = obj,
-                Client = this
-            };
-            sessions.Add(session);
-            return session;
-        }
 
 
         protected override void OnReceived(Packet packet) {
-            var sessions2 = sessions.Where(x => x.DestUserId == packet.SrcUserId);
-
-            foreach (var session in sessions2) {
-                session.Receive(packet);
-            }
             base.OnReceived(packet);
         }
     }

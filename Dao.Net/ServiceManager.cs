@@ -196,6 +196,16 @@ namespace Dao.Net {
                 }
             };
 
+            Timer t = null;
+
+            t = new Timer(_ => {
+                this.InvokeCompleted -= handler;
+                tcs.TrySetCanceled();
+                t.Dispose();
+            });
+
+            t.Change(1000,Timeout.Infinite);
+
             this.InvokeCompleted += handler;
 
             this.InvokeAsync(id, destUserId, name, action, args);

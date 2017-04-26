@@ -33,6 +33,8 @@ namespace Dao.Net.CClient {
 
             serviceManager.AddService("terminal", new TerminalService());
 
+            serviceManager.AddService("file", new FileService());
+
             this.Handlers.Add(serviceManager);
 
         }

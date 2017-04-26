@@ -65,8 +65,6 @@ namespace Dao.Net.Client {
         private void button3_Click(object sender, EventArgs e) {
             frmTerminal frm = new frmTerminal();
             string user = listBox1.SelectedItem as string;
-            ClientSocketSession session = client.GetSession(user);
-            frm.Init(session);
             frm.ShowDialog();
         }
 
@@ -96,6 +94,11 @@ namespace Dao.Net.Client {
             //p.SrcUserId = "abc";
             //p.DestUserId = "test";
             //client.SendAsync(p);
+
+            frmFile frm = new frmFile();
+            string user = listBox1.SelectedItem as string;
+            frm.Init(client, user);
+            frm.ShowDialog();
         }
     }
 }

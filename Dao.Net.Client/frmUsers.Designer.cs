@@ -121,11 +121,11 @@
             // 
             // button7
             // 
-            this.button7.Location = new System.Drawing.Point(302, 13);
+            this.button7.Location = new System.Drawing.Point(170, 200);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(75, 23);
             this.button7.TabIndex = 8;
-            this.button7.Text = "button7";
+            this.button7.Text = "文件";
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 

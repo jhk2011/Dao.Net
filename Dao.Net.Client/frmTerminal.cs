@@ -26,7 +26,7 @@ namespace Dao.Net.Client {
         }
 
         private void TerminalManager_Received(string obj) {
-            textBox2.AppendText(obj) /*+ Environment.NewLine*/;
+            textBox2.AppendText(obj);
         }
 
         private void TerminalManager_Error(string obj) {
@@ -48,11 +48,5 @@ namespace Dao.Net.Client {
             TerminalManager.Received -= TerminalManager_Received;
         }
 
-        ClientSocketSession session;
-        internal void Init(ClientSocketSession session) {
-            this.session = session;
-            TerminalManager = session.TerminalManager;
-            Init();
-        }
     }
 }

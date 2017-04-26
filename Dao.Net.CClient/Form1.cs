@@ -15,10 +15,19 @@ namespace Dao.Net.CClient {
             Start();
         }
 
+        MySocketClient client;
         public async void Start() {
-            MySocketClient client = new MySocketClient();
 
-            await client.ConnectAsync("127.0.0.1", 1234);
+            if (client != null) client.Socket.Close();
+
+            client = new MySocketClient();
+
+            string host = textBox2.Text;
+
+            if (string.IsNullOrEmpty(host)) {
+                host = "127.0.0.1";
+            }
+            await client.ConnectAsync(host, 1234);
 
             client.StartReceive();
 
@@ -26,6 +35,10 @@ namespace Dao.Net.CClient {
 
             userManager.JoinAsync("test", "");
             Console.WriteLine("CClient");
+        }
+
+        private void button5_Click(object sender, EventArgs e) {
+            Start();
         }
     }
 }
