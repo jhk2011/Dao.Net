@@ -7,7 +7,7 @@ using System.Text;
 namespace Dao.Net.Client {
 
 
-    class MySocketClient : SocketClient {
+    class MySocketClient : TaskSocketClient {
 
         public UserManager UserManager { get; set; }
         public FileManager FileManager { get; set; }
@@ -42,9 +42,16 @@ namespace Dao.Net.Client {
                 Session = this
             });
 
-            //this.Handlers.Add(new ServiceManager {
-            //    Session = this
-            //});
+            var serviceManager = new ServiceManager {
+                Session = this
+            };
+
+            serviceManager.AddService("calcCallback", new CalcCallback());
+
+            serviceManager.AddService("terminalCallback", new TerminalCallbackService());
+
+            this.Handlers.Add(serviceManager);
+
         }
 
         List<ClientSocketSession> sessions = new List<ClientSocketSession>();
@@ -60,7 +67,7 @@ namespace Dao.Net.Client {
 
 
         protected override void OnReceived(Packet packet) {
-            var sessions2 = sessions.Where(x => x.DestUserId == packet.DestUserId);
+            var sessions2 = sessions.Where(x => x.DestUserId == packet.SrcUserId);
 
             foreach (var session in sessions2) {
                 session.Receive(packet);

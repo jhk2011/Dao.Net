@@ -10,27 +10,15 @@ namespace Dao.Net.Client {
     class Program {
         static void Main(string[] args) {
 
-            //Terminal t = new Terminal();
-
-           
-            //t.Received += T_Received;
-            //t.Init();
-            //t.Close();
-            //t.Init();
-
-            //while (true) {
-            //    t.Execute(Console.ReadLine()+"\r\n");
-            //}
-
             Application.EnableVisualStyles();
-            Application.Run(new frmMain());
+            Form.CheckForIllegalCrossThreadCalls = false;
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+            Application.ThreadException += Application_ThreadException;
+            Application.Run(new frmUsers());
         }
 
-        private static void T_Received(string obj) {
-            Console.Write(obj);
+        private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e) {
+            Console.WriteLine(e.Exception.Message);
         }
-
-        [DllImport("user32.dll", EntryPoint = "ShowWindow", SetLastError = true)]
-        static extern bool ShowWindow(IntPtr hWnd, uint nCmdShow);
     }
 }

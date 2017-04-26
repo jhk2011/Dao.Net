@@ -10,21 +10,21 @@ namespace Dao.Net {
             if (!string.IsNullOrEmpty(packet.DestUserId)) {
                 SocketSession session2 = FindSocketSession(packet.DestUserId);
                 if (session2 != null) {
-                    Console.WriteLine("转发数据:{0}->{1} 类型{2}",
-                        packet.ScrUserId,
+                    Console.WriteLine("TransferManager:转发数据:{0}->{1} 类型{2}",
+                        packet.SrcUserId,
                         packet.DestUserId,
                         packet.Type);
 
                     session2.SendAsync(packet);
+                    throw new BreakException();
                 }
-                throw new BreakException();
             }
         }
 
-        private SocketSession FindSocketSession(string destUserId) {
+        public SocketSession FindSocketSession(string destUserId) {
             return Server.Sessions
                 .Select(x => x.Handlers.GetHandler<UserManager>())
-                .Where(x => x.UserName == destUserId)
+                .Where(x => x.UserId == destUserId)
                 .Select(x => x.Session)
                 .FirstOrDefault();
         }

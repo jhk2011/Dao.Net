@@ -14,24 +14,43 @@ namespace Dao.Net.Client {
             InitializeComponent();
         }
 
+        string userId;
+
         ServiceManager serviceHandler;
 
-        internal void Init(MySocketClient client) {
-            serviceHandler = client.Handlers.GetHandler<ServiceManager>();
+        private async void button1_Click(object sender, EventArgs e) {
+
+            ICalc calc = serviceHandler.GetServiceProxy<ICalc>("calc", userId);
+
+            var result = await Task.Factory.StartNew(() => {
+                return calc.Add(1, 2);
+            });
+
+            label1.Text = result + "";
+
+            //var result = await serviceHandler
+            //    .InvokeTaskAsync(Guid.NewGuid(), user, "calc", "Add", 1, 2);
+
+            //var result2 = await serviceHandler
+            //    .InvokeTaskAsync(Guid.NewGuid(), user, "calc", "Add", 4, 6);
+
+            //if (result.Success) {
+            //    label1.Text = result.ReturnValue + "";
+            //} else {
+            //    label1.Text = result.Message;
+            //}
         }
 
-        private async void button1_Click(object sender, EventArgs e) {
-            var result = await serviceHandler
-                .InvokeTaskAsync(Guid.NewGuid(), "calc", "Add", 1, 2);
+        internal void Init(string userId, ServiceManager servicemanager) {
+            this.userId = userId;
+            this.serviceHandler = servicemanager;
+            var callback = this.serviceHandler.GetService("calcCallback") as CalcCallback;
+            callback.Info += Callback_Info;
+            label1.Text = userId;
+        }
 
-            var result2 = await serviceHandler
-                .InvokeTaskAsync(Guid.NewGuid(), "calc", "Add",4, 6);
-
-            if (result.Success) {
-                Console.WriteLine(result.ReturnValue);
-            } else {
-                Console.WriteLine(result.Message);
-            }
+        private void Callback_Info(string obj) {
+            Console.WriteLine(obj);
         }
     }
 }

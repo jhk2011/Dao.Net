@@ -43,22 +43,6 @@ namespace Dao.Net {
             return _converter.SendAsync(this, packet);
         }
 
-        public Task SendAsync(byte[] packet) {
-            if (packet == null) throw new ArgumentNullException("buffer");
-            return SendAsync(new Packet(0, packet));
-        }
-
-        public Task SendAsync(int type) {
-            Packet packet = new Packet(type);
-            return SendAsync(packet);
-        }
-
-        public Task SendAsync(string s) {
-            Packet packet = new Packet();
-            packet.SetString(s);
-            return SendAsync(packet);
-        }
-
         public Task<Packet> ReceiveAsync() {
             return _converter.ReceiveAsync(this);
         }
@@ -67,7 +51,7 @@ namespace Dao.Net {
 
             Packet packet = null;
             try {
-                packet = await ReceiveAsync();
+                packet = await ReceiveAsync().ConfigureAwait(false);
             } catch (Exception ex) {
                 Console.WriteLine("Receive Error:{0}", ex.Message);
                 Console.WriteLine(ex.StackTrace);
@@ -80,8 +64,17 @@ namespace Dao.Net {
         }
 
         protected virtual void OnReceived(Packet packet) {
-            Received?.Invoke(this, new ReceivedEventArgs(this, packet));
-            Handlers?.Handle(packet, this);
+
+            try {
+                SocketContext.Current = new SocketContext {
+                    Packet = packet,
+                    Session = this
+                };
+                Received?.Invoke(this, new ReceivedEventArgs(this, packet));
+                Handlers?.Handle(packet, this);
+            } finally {
+                SocketContext.Current = null;
+            }
         }
 
         protected virtual void OnClosed() {

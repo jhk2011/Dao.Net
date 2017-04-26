@@ -23,7 +23,7 @@ namespace Dao.Net {
     }
 
     public class UserManager : ISocketHandler {
-        public string UserName { get; set; }
+        public string UserId { get; set; }
 
         public SocketSession Session { get; set; }
         public SocketServer Server { get; set; }
@@ -33,7 +33,7 @@ namespace Dao.Net {
                 var user = packet.GetObject<JoinInfo>();
                 var result = DoJoin(user);
                 if (result.Code == 0) {
-                    UserName = user.UserName;
+                    UserId = user.UserName;
                 }
                 Packet reply = new Packet(UserPackets.JoinReply);
                 reply.SetObject(result);
@@ -71,7 +71,7 @@ namespace Dao.Net {
         public event Action<List<String>> GetUsers;
 
         public void JoinAsync(string username, string password) {
-            UserName = username;
+            UserId = username;
             Packet packet = new Packet(UserPackets.Join);
             packet.SetObject(new JoinInfo() {
                 UserName = username,
@@ -96,7 +96,8 @@ namespace Dao.Net {
                .Select(x => x.Handlers
                    .OfType<UserManager>()
                    .FirstOrDefault())
-               .Select(x => x.UserName)
+               .Select(x => x.UserId)
+               .Where(x => x != null)
                .ToList();
         }
 

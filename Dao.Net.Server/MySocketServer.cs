@@ -16,22 +16,32 @@ namespace Dao.Net.Server {
         }
 
         protected override void OnAccepted(SocketSession session) {
+
+            //ServiceManager serviceManager = session.Handlers.GetHandler<ServiceManager>();
+
+            //if (serviceManager != null) {
+            //    foreach (var service in serviceManager.GetServices()) {
+            //        ISessionCallback callback = service as ISessionCallback;
+            //        if (callback != null) {
+            //            callback.OnAccept(session);
+            //        }
+            //    }
+            //}
+
             base.OnAccepted(session);
-
-            
-
-            //SystemManager systemManager = new SystemManager() {
-            //    Session = session,
-            //    Sessions = Sessions
-            //};
-            //systemManager.JoinAsync();
-            //session.Handlers.Add(systemManager);
-            System.Console.WriteLine(session.Socket.RemoteEndPoint);
         }
 
         protected override void OnClosed(SocketSession session) {
-            //SystemManager systemmanager = session.Handlers.GetHandler<SystemManager>();
-            //systemmanager?.LeaveAsync();
+
+            //ServiceManager serviceManager = session.Handlers.GetHandler<ServiceManager>();
+
+            //foreach (var service in serviceManager.GetServices()) {
+            //    ISessionCallback callback = service as ISessionCallback;
+            //    if (callback != null) {
+            //        callback.OnClose(session);
+            //    }
+            //}
+
             base.OnClosed(session);
         }
 

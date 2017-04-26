@@ -53,15 +53,11 @@ namespace Dao.Net.Client {
         }
 
         private void button3_Click(object sender, EventArgs e) {
-            frmUsers user = new frmUsers();
-            user.Init(client);
-            user.ShowDialog(this);
+            
         }
 
         private void button4_Click(object sender, EventArgs e) {
-            frmService frm = new frmService();
-            frm.Init(client);
-            frm.ShowDialog(this);
+
         }
     }
 }

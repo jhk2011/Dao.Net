@@ -33,27 +33,18 @@ namespace Dao.Net {
 
         public Guid Id { get; set; }
 
-        public string ScrUserId { get; set; }
+        public string SrcUserId { get; set; }
 
         public string DestUserId { get; set; }
 
-        public Packet(int type, byte[] buffer) {
+
+        public Packet(int type) {
             _type = type;
-            _buffer = buffer;
-        }
-
-        public Packet(byte[] buffer)
-            : this(0, buffer) {
-
-        }
-
-        public Packet(int type)
-            : this(type, null) {
-
+            Id = Guid.NewGuid();
         }
 
         public Packet() {
-
+            Id = Guid.NewGuid();
         }
 
         int _type;

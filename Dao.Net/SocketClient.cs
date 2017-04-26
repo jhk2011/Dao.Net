@@ -37,21 +37,13 @@ namespace Dao.Net {
     }
 
 
-    public class SyncSocketClient : SocketClient {
-
-        SynchronizationContext _synchronizationContext = SynchronizationContext.Current;
+    public class TaskSocketClient : SocketClient {
 
         protected virtual void Raise(Action action) {
             if (action == null) {
                 throw new ArgumentNullException("action");
             }
-            if (_synchronizationContext == null) {
-                Task.Factory.StartNew(action);
-            } else {
-                _synchronizationContext.Post(_ => {
-                    action();
-                }, null);
-            }
+            Task.Factory.StartNew(action);
         }
 
         protected override void OnReceived(Packet packet) {
@@ -64,6 +56,23 @@ namespace Dao.Net {
             Raise(() => {
                 base.OnClosed();
             });
+        }
+    }
+    public class SyncSocketClient : TaskSocketClient {
+
+        SynchronizationContext _synchronizationContext = SynchronizationContext.Current;
+
+        protected override void Raise(Action action) {
+            if (action == null) {
+                throw new ArgumentNullException("action");
+            }
+            if (_synchronizationContext != null) {
+                _synchronizationContext.Post(_ => {
+                    action();
+                }, null);
+            } else {
+                base.Raise(action);
+            }
         }
     }
 }

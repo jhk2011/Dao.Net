@@ -1,4 +1,5 @@
 ﻿using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace Dao.Net.Server {
     class MyServerSession : SocketSession {
@@ -26,17 +27,20 @@ namespace Dao.Net.Server {
             //Handlers.Add(new FileManager(this));
             //Handlers.Add(new TerminalServerManager { Session = this });
 
-            //ServiceManager h = new ServiceManager();
+            ServiceManager serviceManager = new ServiceManager();
 
             //h.AddService("calc", new Calc());
             //h.Session = this;
 
-            //Handlers.Add(h);
+            Handlers.Add(serviceManager);
         }
 
         protected override void OnReceived(Packet packet) {
+            Task.Factory.StartNew(()=> {
+                base.OnReceived(packet);
+            });
             //System.Console.WriteLine("OnReceived:{0}", packet.Type);
-            base.OnReceived(packet);
+            
         }
     }
 }

@@ -23,18 +23,18 @@
             terminal.Execute(info.Command);
         }
 
-        private void Terminal_Error(string obj) {
+        private void Terminal_Error(Terminal t, string obj) {
             Packet p = new Packet(TerminalPackets.Error);
             p.SetString(obj);
-            p.ScrUserId = DestUserId;
+            p.SrcUserId = DestUserId;
             p.DestUserId = SrcUserId;
             Session.SendAsync(p);
         }
 
-        private void Terminal_Received(string obj) {
+        private void Terminal_Received(Terminal t, string obj) {
             Packet p = new Packet(TerminalPackets.Receive);
             p.SetString(obj);
-            p.ScrUserId = DestUserId;
+            p.SrcUserId = DestUserId;
             p.DestUserId = SrcUserId;
             Session.SendAsync(p);
         }

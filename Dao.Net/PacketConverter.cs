@@ -32,7 +32,7 @@ namespace Dao.Net {
                 throw new InvalidOperationException("接收到的长度超过限制");
             }
 
-            packet.ScrUserId = await ReadString(session);
+            packet.SrcUserId = await ReadString(session);
             packet.DestUserId = await ReadString(session);
 
 
@@ -41,7 +41,7 @@ namespace Dao.Net {
             packet.Buffer = buffer;
 
             Console.WriteLine("Receive:{0}->{1} {2}",
-                packet.ScrUserId ?? "[null]",
+                packet.SrcUserId ?? "[null]",
                 packet.DestUserId ?? "[null]", type);
 
             return packet;
@@ -63,7 +63,7 @@ namespace Dao.Net {
             if (packet == null) throw new ArgumentNullException("buffer");
 
             Console.WriteLine("Send:{0}->{1} {2}",
-                packet.ScrUserId ?? "[null]",
+                packet.SrcUserId ?? "[null]",
                 packet.DestUserId ?? "[null]", packet.Type);
 
             using (MemoryStream ms = new MemoryStream()) {
@@ -73,7 +73,7 @@ namespace Dao.Net {
                 ms.Write(header1, 0, header1.Length);
                 ms.Write(header2, 0, header2.Length);
 
-                WriteString(ms, packet.ScrUserId);
+                WriteString(ms, packet.SrcUserId);
                 WriteString(ms, packet.DestUserId);
 
                 ms.Write(buffer, 0, buffer.Length);

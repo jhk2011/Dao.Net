@@ -57,7 +57,7 @@ namespace Dao.Net {
 
             if (manager == null) {
                 manager = new TerminalManager2 {
-                    SrcUserId = packet.ScrUserId,
+                    SrcUserId = packet.SrcUserId,
                     DestUserId = packet.DestUserId,
                     Session = this.Session
                 };

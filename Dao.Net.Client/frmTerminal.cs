@@ -46,7 +46,6 @@ namespace Dao.Net.Client {
             TerminalManager.CloseAsync();
             TerminalManager.Error -= TerminalManager_Error;
             TerminalManager.Received -= TerminalManager_Received;
-            TerminalManager.InitAsync();
         }
 
         ClientSocketSession session;

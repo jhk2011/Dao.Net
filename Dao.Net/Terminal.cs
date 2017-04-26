@@ -100,7 +100,7 @@ namespace Dao.Net {
                 while (!process.StandardOutput.EndOfStream) {
 
                     char ch = reader.ReadChar();
-                    Received?.Invoke(ch.ToString());
+                    Received?.Invoke(this,ch.ToString());
 
                     //string s = process.StandardOutput.ReadLine();
 
@@ -112,7 +112,7 @@ namespace Dao.Net {
             Task.Factory.StartNew(() => {
                 while (!process.StandardOutput.EndOfStream) {
                     string s = process.StandardError.ReadLine();
-                    Error?.Invoke(s);
+                    Error?.Invoke(this,s);
                 }
             });
 
@@ -131,16 +131,16 @@ namespace Dao.Net {
         }
 
 
-        public event Action<String> Received;
+        public event Action<Terminal, String> Received;
 
-        public event Action<String> Error;
+        public event Action<Terminal, String> Error;
 
         private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e) {
-            Received?.Invoke(e.Data);
+            Received?.Invoke(this, e.Data);
         }
 
         private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e) {
-            Error?.Invoke(e.Data);
+            Error?.Invoke(this, e.Data);
         }
 
         public void Close() {

@@ -18,9 +18,9 @@ namespace Dao.Net.Client {
         }
 
         public override Task SendAsync(Packet packet) {
-            packet.ScrUserId = Client.Handlers
+            packet.SrcUserId = Client.Handlers
                 .GetHandler<UserManager>()
-                ?.UserName;
+                ?.UserId;
 
             packet.DestUserId = DestUserId;
             return base.SendAsync(packet);
@@ -29,13 +29,13 @@ namespace Dao.Net.Client {
         protected override void OnReceived(Packet packet) {
             var username = Client.Handlers
                 .GetHandler<UserManager>()
-                ?.UserName;
+                ?.UserId;
 
             //if (packet.DestUserId != username) {
             //    throw new InvalidOperationException("");
             //}
 
-            if (packet.ScrUserId == DestUserId) {
+            if (packet.SrcUserId == DestUserId) {
                 base.OnReceived(packet);
             }
         }
