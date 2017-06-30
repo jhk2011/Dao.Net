@@ -44,33 +44,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BreakException.cs" />
     <Compile Include="Calc.cs" />
-    <Compile Include="FileManager.cs" />
+    <Compile Include="HandleContext.cs" />
     <Compile Include="IPacketConverter.cs" />
+    <Compile Include="ISocketHandler.cs" />
     <Compile Include="Packet.cs" />
-    <Compile Include="PacketAttribute.cs" />
     <Compile Include="PacketConverter.cs" />
-    <Compile Include="PacketHandler.cs" />
     <Compile Include="PacketHandlerCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RealProxy.cs" />
     <Compile Include="ServiceManager.cs" />
     <Compile Include="ServiceProxy.cs" />
+    <Compile Include="ServiceProxyManager.cs" />
     <Compile Include="SocketClient.cs" />
+    <Compile Include="SocketContext.cs" />
     <Compile Include="SocketEventArgs.cs" />
     <Compile Include="SocketExtensions.cs" />
     <Compile Include="SocketListener.cs" />
     <Compile Include="SocketServer.cs" />
     <Compile Include="SocketSession.cs" />
     <Compile Include="SocketSessionCollection.cs" />
-    <Compile Include="Terminal.cs" />
-    <Compile Include="TerminalClientManager.cs" />
-    <Compile Include="TerminalManager2.cs" />
-    <Compile Include="TerminalServerManager.cs" />
-    <Compile Include="TerminalService.cs" />
-    <Compile Include="TransferManager.cs" />
-    <Compile Include="UserManager.cs" />
+    <Compile Include="T.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

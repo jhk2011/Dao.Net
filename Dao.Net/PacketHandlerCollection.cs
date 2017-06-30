@@ -2,19 +2,11 @@
 using System.Linq;
 
 namespace Dao.Net {
-    public class PacketHandlerCollection : Collection<ISocketHandler> {
-        public void Handle(Packet packet, SocketSession session) {
+    public class SocketHandlerCollection : Collection<ISocketHandler> {
+        public void Handle(HandleContext context) {
             foreach (var handler in this) {
-                try {
-                    handler?.Handle(packet, session);
-                } catch(BreakException) {
-                    break;
-                }
+                handler?.Handle(context);
             }
-        }
-
-        public T GetHandler<T>() {
-            return this.OfType<T>().FirstOrDefault();
         }
     }
 }

@@ -1,47 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿namespace Dao.Net.CClient {
+    public class MySocketClient : SocketClient {
 
-namespace Dao.Net.CClient {
+        public ICalc calc;
 
+        public ITerminalService Terminal { get; set; }
 
-    class MySocketClient : TaskSocketClient {
-
+        public TerminalCallbackService TerminalCallback { get; set; }
 
         public MySocketClient() {
-            this.Handlers = new PacketHandlerCollection();
 
+            this.Handlers = new SocketHandlerCollection();
 
-            var UserManager = new UserManager() { Session = this };
+            ServiceManager serviceManager = new ServiceManager();
 
-            var TerminalManager = new TerminalClientManager { Session = this };
-
-            this.Handlers.Add(UserManager);
-            this.Handlers.Add(TerminalManager);
-
-            this.Handlers.Add(new TerminalServerManager() {
-                Session = this
-            });
-
-            var serviceManager = new ServiceManager {
-                Session = this
-            };
-
-            serviceManager.AddService("calc", new Calc());
-
-            serviceManager.AddService("terminal", new TerminalService());
-
-            serviceManager.AddService("file", new FileService());
+            serviceManager.AddService("calct", new CalcTip());
 
             this.Handlers.Add(serviceManager);
 
+            var serviceProxyManager = new ServiceProxyManager() {
+                Session = this
+            };
+
+            TerminalCallback = new TerminalCallbackService();
+
+            serviceManager.AddService("tc", TerminalCallback);
+
+            calc = serviceProxyManager.GetServiceProxy<ICalc>("calc");
+
+           
+            Terminal = serviceProxyManager.GetServiceProxy<ITerminalService>("t");
+
+            this.Handlers.Add(serviceProxyManager);
         }
 
         protected override void OnReceived(Packet packet) {
-            //Console.WriteLine("Received Type={0}", packet.Type);
             base.OnReceived(packet);
+            System.Console.WriteLine("--收到:{0}",packet.Type);
         }
     }
 }

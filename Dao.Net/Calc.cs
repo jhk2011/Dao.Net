@@ -2,44 +2,39 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Dao.Net {
-
     public interface ICalc {
-        double Add(int a, int b);
-    }
-    public interface ICalcCallback {
-        void OnInfo(string s);
+        double Add(double x, double y);
     }
 
     public class Calc : ICalc {
 
-        public double Add(int a, int b) {
-            Info("计算前");
-            double result = a + b;
-            Info("计算后");
-            return result;
-        }
+        public ICalcTip tip;
 
-        public void Info(string s) {
-            var ctx = SocketContext.Current;
+        public double Add(double x, double y) {
 
-            var serviceManager = ctx.Session.Handlers.GetHandler<ServiceManager>();
+            try {
+               tip.Info(string.Format("{0}+{1}", x, y));
+            } catch (Exception) {
 
-            var callback = serviceManager.GetServiceProxy<ICalcCallback>("calcCallback",
-                ctx.Packet.SrcUserId);
+            }
+           
 
-            callback?.OnInfo(s);
-
+            return x + y;
         }
     }
 
-    public class CalcCallback : ICalcCallback {
+    public interface ICalcTip {
+        void Info(string s);
+    }
 
-        public event Action<string> Info;
-        public void OnInfo(string s) {
-            Info?.Invoke(s);
+    public class CalcTip : ICalcTip {
+        public void Info(string s) {
+            //Thread.Sleep(200);
+            Console.WriteLine(s);
         }
     }
 }

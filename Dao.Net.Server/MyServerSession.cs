@@ -1,46 +1,46 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace Dao.Net.Server {
+
+
+
+
     class MyServerSession : SocketSession {
 
         public MySocketServer Server { get; set; }
 
         public MyServerSession(Socket socket, MySocketServer server) : base(socket) {
+
             Server = server;
-            this.Handlers = new PacketHandlerCollection();
 
-            Handlers.Add(new UserManager {
-                Server = server,
+            this.Handlers = new SocketHandlerCollection();
+
+            ServiceProxyManager proxyManager = new ServiceProxyManager() {
                 Session = this
-            });
-
-            Handlers.Add(new TransferManager() {
-                Server = server
-            });
-
-            //Handlers.Add(new MyServerHandler());
-            //Handlers.Add(new UserManager() {
-            //    Session = this,
-            //    Server = server
-            //});
-            //Handlers.Add(new FileManager(this));
-            //Handlers.Add(new TerminalServerManager { Session = this });
+            };
 
             ServiceManager serviceManager = new ServiceManager();
 
-            //h.AddService("calc", new Calc());
-            //h.Session = this;
+            ICalcTip tip = proxyManager.GetServiceProxy<ICalcTip>("calct");
+
+            this.Handlers.Add(proxyManager);
+
+            serviceManager.AddService("calc", new Calc() {
+                tip = tip
+            });
+
+            ITermainalCallbackService callback = proxyManager.GetServiceProxy<ITermainalCallbackService>("tc");
+
+            serviceManager.AddService("t", new TerminalService(callback));
 
             Handlers.Add(serviceManager);
         }
 
         protected override void OnReceived(Packet packet) {
-            Task.Factory.StartNew(()=> {
-                base.OnReceived(packet);
-            });
+            base.OnReceived(packet);
             //System.Console.WriteLine("OnReceived:{0}", packet.Type);
-            
         }
     }
 }

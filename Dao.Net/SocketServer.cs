@@ -98,6 +98,15 @@ namespace Dao.Net {
     /// 在线程的同步上下文引发事件
     /// </summary>
     public class SyncSocketServer : SocketServer {
+
+        public SyncSocketServer() {
+
+        }
+
+        public SyncSocketServer(SocketListener l) : base(l) {
+
+        }
+
         SynchronizationContext _syncContext = SynchronizationContext.Current;
 
         protected virtual void Raise(Action action) {
@@ -126,8 +135,6 @@ namespace Dao.Net {
                 base.OnClosed(session);
             });
         }
-
-
     }
 
 }

@@ -1,7 +1,7 @@
 ﻿using System.Net.Sockets;
 
 namespace Dao.Net.Server {
-    class MySocketServer : SocketServer {
+    class MySocketServer : SyncSocketServer {
 
         public MySocketServer() {
 
@@ -16,31 +16,10 @@ namespace Dao.Net.Server {
         }
 
         protected override void OnAccepted(SocketSession session) {
-
-            //ServiceManager serviceManager = session.Handlers.GetHandler<ServiceManager>();
-
-            //if (serviceManager != null) {
-            //    foreach (var service in serviceManager.GetServices()) {
-            //        ISessionCallback callback = service as ISessionCallback;
-            //        if (callback != null) {
-            //            callback.OnAccept(session);
-            //        }
-            //    }
-            //}
-
             base.OnAccepted(session);
         }
 
         protected override void OnClosed(SocketSession session) {
-
-            //ServiceManager serviceManager = session.Handlers.GetHandler<ServiceManager>();
-
-            //foreach (var service in serviceManager.GetServices()) {
-            //    ISessionCallback callback = service as ISessionCallback;
-            //    if (callback != null) {
-            //        callback.OnClose(session);
-            //    }
-            //}
 
             base.OnClosed(session);
         }

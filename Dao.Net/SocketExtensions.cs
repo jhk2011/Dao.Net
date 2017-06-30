@@ -41,19 +41,19 @@ namespace Dao.Net
                 return socket.BeginReceive(arg.Buffer, arg.Offset, arg.Size, SocketFlags.None, callback, state);
             }
 
-            public static Task<int> SendTaskAsync(this Socket socket, byte[] buffer, int offset, int size)
+            public static async Task<int> SendTaskAsync(this Socket socket, byte[] buffer, int offset, int size)
             {
-                return Task.Factory.FromAsync<ByteArray, int>(socket.BeginSend, socket.EndSend,
-                    new ByteArray(buffer, offset, size), null);
+               return await Task.Factory.FromAsync<ByteArray, int>(socket.BeginSend, socket.EndSend,
+                    new ByteArray(buffer, offset, size), null).ConfigureAwait(false);
             }
             public static Task<int> SendTaskAsync(this Socket socket, byte[] buffer)
             {
                 return socket.SendTaskAsync(buffer, 0, buffer.Length);
             }
-            public static Task<int> ReceiveTaskAsync(this Socket socket, byte[] buffer, int offset, int size)
+            public async static Task<int> ReceiveTaskAsync(this Socket socket, byte[] buffer, int offset, int size)
             {
-                return Task.Factory.FromAsync<ByteArray, int>(socket.BeginReceive, socket.EndReceive,
-                    new ByteArray(buffer, offset, size), null);
+               return await Task.Factory.FromAsync<ByteArray, int>(socket.BeginReceive, socket.EndReceive,
+                    new ByteArray(buffer, offset, size), null).ConfigureAwait(false);
             }
 
             public static Task<int> ReceiveTaskAsync(this Socket socket, byte[] buffer)
@@ -69,7 +69,7 @@ namespace Dao.Net
 
                 while (count < size)
                 {
-                    int n = await socket.SendTaskAsync(buffer, offset, size);
+                    int n = await socket.SendTaskAsync(buffer, offset, size).ConfigureAwait(false);
                     count += n;
                     size -= n;
                 }
@@ -85,7 +85,7 @@ namespace Dao.Net
 
                 while (count < size)
                 {
-                    int n = await socket.ReceiveTaskAsync(buffer, offset, size);
+                    int n = await socket.ReceiveTaskAsync(buffer, offset, size).ConfigureAwait(false);
                     count += n;
                     size -= n;
                 }
