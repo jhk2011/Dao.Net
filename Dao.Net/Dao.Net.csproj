@@ -44,6 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dynamic\DynamicDelegate.cs" />
+    <Compile Include="Dynamic\DynamicDelegateBuilder.cs" />
     <Compile Include="HandleContext.cs" />
     <Compile Include="TransferHandler.cs" />
     <Compile Include="Web\HttpHandler.cs" />

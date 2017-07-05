@@ -6,19 +6,26 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-using Dao.Dynamic;
+using Dao.Net.Dynamic;
 
-namespace Dao.Net.Tests {
-    class Program {
-        static void Main(string[] args) {
+namespace Dao.Net.Tests
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
 
             DynamicDelegate d = new DynamicDelegate();
 
 
-            d.CreateDelegate(typeof(Action<string>), (e) => {
-                Console.WriteLine(e.Length);
-            });
+            var de = d.CreateDelegate<Action<string, int>>((e) =>
+               {
+                   Console.WriteLine(e.Length);
+               });
 
+            de("abc",1);
+
+            return;
 
             EventRealProxy proxy = new EventRealProxy(typeof(IHello));
 
@@ -35,12 +42,14 @@ namespace Dao.Net.Tests {
             Console.WriteLine();
         }
 
-        private static void Hello_Hello(object sender, EventArgs e) {
+        private static void Hello_Hello(object sender, EventArgs e)
+        {
             Console.WriteLine("Hello");
         }
     }
 
-    public interface IHello {
+    public interface IHello
+    {
         event EventHandler Hello;
     }
 

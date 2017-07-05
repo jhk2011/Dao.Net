@@ -5,15 +5,17 @@ using System.Text;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace Dao.Dynamic {
+namespace Dao.Net.Dynamic
+{
 
 
-    public class DynamicDelegateBuilder {
+    public class DynamicDelegateBuilder
+    {
 
-        public const string AssemblyName = "Dao.Dynamic.DynamicDelegate";
-        public const string ModuleName = "Dao.Dynamic.DynamicDelegate";
-        public const string FileName = "Dao.Dynamic.DynamicDelegate.dll";
-        public const string TypeName = "Dao.Dynamic.DynamicDelegate{0}";
+        public const string AssemblyName = "Dao.Net.Dynamic.DynamicDelegate";
+        public const string ModuleName = "Dao.Net.Dynamic.DynamicDelegate";
+        public const string FileName = "Dao.Net.Dynamic.DynamicDelegate.dll";
+        public const string TypeName = "Dao.Net.Dynamic.DynamicDelegate{0}";
 
         AssemblyName _assemblyName;
 
@@ -31,7 +33,8 @@ namespace Dao.Dynamic {
             get { return _modelBuilder; }
         }
 
-        public DynamicDelegateBuilder() {
+        public DynamicDelegateBuilder()
+        {
             _assemblyName = new AssemblyName(AssemblyName);
 
             _assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(
@@ -42,13 +45,14 @@ namespace Dao.Dynamic {
             _modelBuilder = _assemblyBuilder.DefineDynamicModule(ModuleName, FileName);
         }
 
-        public Type CreateType(Type type) {
+        public Type CreateType(Type type)
+        {
             if (type.BaseType != typeof(MulticastDelegate))
                 throw new ArgumentException("");
 
 
             TypeBuilder tb = _modelBuilder.DefineType(
-                "Type" + Guid.NewGuid().GetHashCode(),
+                "DynamicDelegate" + Guid.NewGuid().ToString("N"),
                 TypeAttributes.Public,
                 null);
 
@@ -61,26 +65,30 @@ namespace Dao.Dynamic {
             return tb.CreateType();
         }
 
-        public object CreateObject(Type type, Action<object[]> action) {
+        public object CreateObject(Type type, Action<object[]> action)
+        {
             Type type2 = CreateType(type);
             _assemblyBuilder.Save(FileName);
             return Activator.CreateInstance(type2, action);
         }
 
-        public Delegate CreateDelegate(Type type, Action<object[]> action) {
+        public Delegate CreateDelegate(Type type, Action<object[]> action)
+        {
             object obj = CreateObject(type, action);
             MethodInfo method = obj.GetType().GetMethod("Invoke");
-            return Delegate.CreateDelegate(type, method);
+            return Delegate.CreateDelegate(type, obj, method);
         }
 
-        private void BuildMethod(TypeBuilder tb, FieldBuilder fb, Type type) {
+        private void BuildMethod(TypeBuilder tb, FieldBuilder fb, Type type)
+        {
 
             MethodInfo method = type.GetMethod("Invoke");
 
             Type returnType = method.ReturnType;
             Type[] parameters = method.GetParameters().Select(x => x.ParameterType).ToArray();
 
-            MethodBuilder mb = tb.DefineMethod("Invoke", MethodAttributes.Public, CallingConventions.Standard,
+            MethodBuilder mb = tb.DefineMethod("Invoke", MethodAttributes.Public,
+                CallingConventions.Standard,
                  returnType, parameters);
 
             ILGenerator il = mb.GetILGenerator();
@@ -89,22 +97,31 @@ namespace Dao.Dynamic {
             il.Emit(OpCodes.Ldfld, fb);
 
             il.Emit(OpCodes.Ldc_I4, parameters.Length);
-            il.Emit(OpCodes.Newarr, typeof(object[]));
+            il.Emit(OpCodes.Newarr, typeof(object));
 
-            //for (int i = 0; i < parameters.Length; i++) {
-            //    il.Emit(OpCodes.Dup);
-            //    il.Emit(OpCodes.Ldc_I4, i);
-            //    //il.Emit(OpCodes.Ldc_I4, i + 1);
-            //    il.Emit(OpCodes.Ldarg,i+1);
-            //    il.Emit(OpCodes.Stelem);
-            //}
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                il.Emit(OpCodes.Dup);
+
+                il.Emit(OpCodes.Ldc_I4, i);
+                //il.Emit(OpCodes.Ldc_I4, i + 1);
+                il.Emit(OpCodes.Ldarg, i + 1);
+
+                if (parameters[i].IsValueType)
+                {
+                    il.Emit(OpCodes.Box, parameters[i]);
+                }
+
+                il.Emit(OpCodes.Stelem_Ref);
+            }
 
             il.Emit(OpCodes.Call, typeof(Action<object[]>).GetMethod("Invoke"));
 
             il.Emit(OpCodes.Ret);
         }
 
-        private void BuildConstructor(TypeBuilder tb, FieldBuilder fb) {
+        private void BuildConstructor(TypeBuilder tb, FieldBuilder fb)
+        {
             var cb = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, new Type[] { typeof(Action<object[]>) });
             ILGenerator il = cb.GetILGenerator();
             il.Emit(OpCodes.Ldarg_0);
