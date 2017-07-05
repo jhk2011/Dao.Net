@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Dao.Net {
 
-    public class ServiceProxy : BaseRealProxy {
+    public class ServiceProxy : EventRealProxy {
 
         public string ServiceName { get; set; }
 
@@ -23,9 +23,16 @@ namespace Dao.Net {
             ServiceHandler = serviceHandler;
             ServiceName = serviceName;
             UserId = userId;
+            ServiceHandler.Raised += ServiceHandler_Raised;
         }
 
-        public override void OnInvoke(InvocationContext context) {
+        private void ServiceHandler_Raised(EventInfo obj) {
+            if (obj.Name == ServiceName) {
+                Raise(obj.Event, obj.Arguemnts);
+            }
+        }
+
+        protected override void OnInvokeMethod(InvocationContext context) {
 
             var method = context.Method as MethodInfo;
 

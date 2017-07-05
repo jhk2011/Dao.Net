@@ -4,7 +4,7 @@ using System.Linq;
 namespace Dao.Net.Web {
     public class HttpHeaderCollection : Collection<HttpHeader> {
         public void Add(string name, string value) {
-
+            this.Add(new HttpHeader(name, value));
         }
 
         public string this[string name]

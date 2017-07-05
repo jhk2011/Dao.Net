@@ -92,6 +92,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dao.Net.App\Dao.Net.App.csproj">
+      <Project>{0a96a15a-829b-4be7-be7a-de246a593310}</Project>
+      <Name>Dao.Net.App</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dao.Net\Dao.Net.csproj">
       <Project>{eedaf70c-63d7-4f18-baf2-8fef070e34a8}</Project>
       <Name>Dao.Net</Name>

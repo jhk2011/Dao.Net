@@ -26,6 +26,17 @@ namespace Dao.Net {
     }
 
     [Serializable]
+    public class EventInfo {
+        public Guid Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string Event { get; set; }
+
+        public object[] Arguemnts { get; set; }
+    }
+
+    [Serializable]
     public class ServiceInvokeResult : ITransferable, IResponse {
         public Guid Id { get; set; }
         public bool Success { get; set; }
@@ -47,7 +58,12 @@ namespace Dao.Net {
             }
         }
 
+        SocketSession session = null;
+
         public override void Accept(HandleContext context) {
+
+            session = context.Session;
+
             foreach (var service in services) {
                 IService iservice = service.Value as IService;
                 iservice?.OnAccept();
@@ -76,8 +92,60 @@ namespace Dao.Net {
 
         Dictionary<string, object> services = new Dictionary<string, object>();
 
+        public Delegate GetDelegate(Type type, Action<object, object[]> handler, object state) {
+            return null;
+        }
+
+        class MyClass {
+
+            Action<object[], object> handler;
+
+            object state;
+
+            public void Invoke(string a, string b) {
+                object[] args = new object[] {
+                    a,b
+                };
+                handler.Invoke(args, state);
+            }
+        }
+
         public void AddService(string name, object service) {
             services.Add(name, service);
+
+            foreach (var e in service.GetType().GetEvents()) {
+                var method = e.GetAddMethod();
+
+                if (e.EventHandlerType == typeof(Action<string>)) {
+
+                    method.Invoke(service, new object[] {
+                        new Action<string>((s)=>{
+                            Raise(session,name,e.Name,s);
+                        })
+                    });
+                } else {
+
+                    var handler = GetDelegate(e.EventHandlerType, (state, args) => {
+                        object[] p = state as object[];
+                        Raise(session, p[0] as string, p[2] as string, args);
+                    }, new object[] { name, e.Name });
+
+                    method.Invoke(service, new object[] { handler });
+
+                    //method.Invoke(service, new object[] { });
+                }
+            }
+
+        }
+
+        public async void Raise(SocketSession session, string name, string e, params object[] args) {
+
+            await session.SendAsync(new EventInfo {
+                Event = e,
+                Name = name,
+                Id = Guid.NewGuid(),
+                Arguemnts = args
+            });
         }
 
         public List<object> GetServices() {

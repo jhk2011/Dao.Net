@@ -12,13 +12,22 @@ namespace Dao.Net {
             var packet = context.Packet;
             var session = context.Session;
 
-            IResponse response = packet as IResponse;
+            var response = packet as IResponse;
 
-            if (response == null) return;
+            if (response != null) {
+                Console.WriteLine("调用回复");
 
-            Console.WriteLine("调用回复");
+                Invoked?.Invoke(response);
+            }
 
-            Invoked?.Invoke(response);
+            var e = packet as EventInfo;
+
+            if (e != null) {
+
+                Console.WriteLine("事件");
+
+                Raised?.Invoke(e);
+            }
         }
 
         public SocketSession Session { get; set; }
@@ -37,6 +46,8 @@ namespace Dao.Net {
         }
 
         public event Action<IResponse> Invoked;
+
+        public event Action<EventInfo> Raised;
 
         public Task<IResponse> InvokeTaskAsync(ServiceInvoke info) {
 
@@ -72,7 +83,7 @@ namespace Dao.Net {
         public async Task<T> InvokeTaskAsync2<T>(ServiceInvoke info) {
 
             var result = await InvokeTaskAsync(info);
-             
+
             if (result.Success) {
 
                 var invokeResult = result as ServiceInvokeResult;

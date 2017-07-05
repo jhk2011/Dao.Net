@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EEDAF70C-63D7-4F18-BAF2-8FEF070E34A8}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dao.Net</RootNamespace>
-    <AssemblyName>Dao.Net</AssemblyName>
+    <ProjectGuid>{9233B8B6-4A5E-430D-B6A3-9FCDEEFFD937}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Dao.Net.Tests</RootNamespace>
+    <AssemblyName>Dao.Net.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -30,12 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ESFramework">
-      <HintPath>..\..\..\..\..\Downloads\ESFramework6.0\ESFramework6.0\ESFramework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,36 +42,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HandleContext.cs" />
-    <Compile Include="TransferHandler.cs" />
-    <Compile Include="Web\HttpHandler.cs" />
-    <Compile Include="Web\HttpHeader.cs" />
-    <Compile Include="Web\HttpHeaderCollection.cs" />
-    <Compile Include="Web\HttpHeaderParser.cs" />
-    <Compile Include="Web\HttpHeaders.cs" />
-    <Compile Include="Web\HttpRequest.cs" />
-    <Compile Include="Web\HttpResponse.cs" />
-    <Compile Include="Web\HttpConverter.cs" />
-    <Compile Include="ServiceClientHandler.cs" />
-    <Compile Include="ServiceHandler.cs" />
-    <Compile Include="SocketConverter.cs" />
-    <Compile Include="SocketHandler.cs" />
+    <Compile Include="DynamicDelegateBuilder.cs" />
+    <Compile Include="DynamicDelegate.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RealProxy.cs" />
-    <Compile Include="ServiceProxy.cs" />
-    <Compile Include="SocketClient.cs" />
-    <Compile Include="SocketContext.cs" />
-    <Compile Include="SocketEventArgs.cs" />
-    <Compile Include="SocketExtensions.cs" />
-    <Compile Include="SocketHandlerCollection.cs" />
-    <Compile Include="SocketListener.cs" />
-    <Compile Include="SocketServer.cs" />
-    <Compile Include="SocketSession.cs" />
-    <Compile Include="SocketSessionCollection.cs" />
-    <Compile Include="StreamExtensions.cs" />
-    <Compile Include="SocketModels.cs" />
-    <Compile Include="Web\HttpServer.cs" />
-    <Compile Include="Web\HttpSession.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dao.Net\Dao.Net.csproj">
+      <Project>{eedaf70c-63d7-4f18-baf2-8fef070e34a8}</Project>
+      <Name>Dao.Net</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

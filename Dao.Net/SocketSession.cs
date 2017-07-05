@@ -48,7 +48,7 @@ namespace Dao.Net {
 
         public SocketHandlerCollection Handlers { get { return handlers; } }
 
-        public async Task SendAsync(object packet) {
+        public virtual async Task SendAsync(object packet) {
 
             if (packet == null) throw new ArgumentNullException("packet");
 

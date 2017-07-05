@@ -27,6 +27,14 @@ namespace Dao.Net.Server {
                 callback = calcCallback
             });
 
+            Calc2 calc2 = new Calc2();
+
+            //calc2.Added += (s) => {
+            //    serviceManager.Raise(this, "calc2", "Added",s);
+            //};
+
+            serviceManager.AddService("calc2", calc2);
+
             ITermainalCallbackService callback = serviceClientHandler
                 .GetServiceProxy<ITermainalCallbackService>("tc");
 
@@ -36,6 +44,5 @@ namespace Dao.Net.Server {
 
             Handlers.Add(new MyServerHandler());
         }
-
     }
 }

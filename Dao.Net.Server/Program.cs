@@ -7,12 +7,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using Dao.Net.Web;
+
 namespace Dao.Net.Server {
     partial class Program {
 
         static void Main(string[] args) {
 
-            HttpSocketServier httpServer = new HttpSocketServier();
+            HttpServer httpServer = new HttpServer();
 
             httpServer.Initialize(8080);
 

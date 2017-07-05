@@ -53,8 +53,12 @@ namespace Dao.Net.Web {
 
             await writer.WriteLineAsync(response.Line);
 
+            Console.WriteLine(response.Line);
+
             foreach (var header in response.Headers) {
-                await writer.WriteLineAsync(headParser.To(header));
+                string s = headParser.To(header);
+                await writer.WriteLineAsync(s);
+                Console.WriteLine(s);
             }
 
             await writer.WriteLineAsync("");

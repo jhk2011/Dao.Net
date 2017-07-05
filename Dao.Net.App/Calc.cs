@@ -12,6 +12,7 @@ namespace Dao.Net {
         Task<double> AddAsync(double x, double y);
     }
 
+
     public class Calc : ICalc {
 
         public ICalcback callback;

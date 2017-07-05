@@ -50,19 +50,18 @@ namespace Dao.Net.Web {
             response.Line = "HTTP/1.1 200 OK";
 
             response.Headers.Add("Date", "Fri, 22 May 2009 06:07:21 GMT");
-            response.Headers.Add("Connection", "close");
+           // response.Headers.Add("Connection", "keep-alive");
 
 
             string url = request.Line.Split(new char[] { ' ' })[1];
 
-            string root = @"F:\";
+            string root = @"D:\";
 
             string path = Path.Combine(root, url.TrimStart('/'));
 
             string s = null;
 
             if (Directory.Exists(path)) {
-                s = "<h3>文件</h3>";
                 s += "<ul>";
                 foreach (var file in Directory.GetFileSystemEntries(path)) {
 
@@ -87,7 +86,7 @@ namespace Dao.Net.Web {
             }
 
             if (response.Body != null) {
-                response.Headers.Add("Content-Length:", response.Body.Length + "");
+                response.Headers.Add("Content-Length", response.Body.Length + "");
             }
 
             response.Headers.Add("Content-Type", contentType);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
@@ -48,6 +49,75 @@ namespace Dao.Net
                 //Console.WriteLine("Exception");
                 return new ReturnMessage(ex, mcm);
             }
+        }
+    }
+
+    public class EventRealProxy : BaseRealProxy {
+
+        EventHandlerList handlers = new EventHandlerList();
+
+        Dictionary<string, object> handlerKeys = new Dictionary<string, object>();
+
+        public EventRealProxy(Type type) : base(type) {
+
+        }
+
+        object GetHandlerKey(string name) {
+            object key;
+
+            if (handlerKeys.TryGetValue(name, out key)) {
+                return key;
+            }
+
+            key = new object();
+
+            handlerKeys.Add(name, key);
+
+            return key;
+        }
+
+        public override void OnInvoke(InvocationContext context) {
+
+            Console.WriteLine(context.Method);
+
+            MethodInfo method = context.Method as MethodInfo;
+
+            if (method.IsSpecialName) {
+
+                if (method.Name.StartsWith("add_")) {
+
+                    //发送给服务器
+
+                    string name = method.Name.Replace("add_", "");
+
+                    object key = GetHandlerKey(name);
+
+                    handlers.AddHandler(key, context.Arguments[0] as Delegate);
+
+                } else if (method.Name.StartsWith("remove_")) {
+
+
+                    string name = method.Name.Replace("remove_", "");
+
+                    object key = GetHandlerKey(name);
+
+                    handlers.RemoveHandler(key, context.Arguments[0] as Delegate);
+                }
+            } else {
+                OnInvokeMethod(context);
+            }
+        }
+
+        protected virtual void OnInvokeMethod(InvocationContext context) {
+
+        }
+        public void Raise(string name, params object[] args) {
+
+            object key = GetHandlerKey(name);
+
+            var handler = handlers[key];
+
+            handler?.DynamicInvoke(args);
         }
     }
 

@@ -1,19 +1,17 @@
 ﻿using System.Net.Sockets;
 using Dao.Net.Web;
 
-namespace Dao.Net.Server {
-    partial class Program {
-        public class HttpSocketSession : SocketSession {
+namespace Dao.Net.Web {
+  
+        public class HttpSession : SocketSession {
 
-            public HttpSocketSession(Socket socket) : base(socket) {
+            public HttpSession(Socket socket) : base(socket) {
                 this.Handlers.Add(new HttpHandler());
             }
 
             protected override ISocketConverter GetConverter() {
                 return new HttpConverter(this);
             }
-
         }
 
-    }
 }

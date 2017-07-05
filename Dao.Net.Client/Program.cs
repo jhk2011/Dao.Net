@@ -12,7 +12,7 @@ namespace Dao.Net.Client {
 
             F();
 
-            Console.ReadLine();
+             Console.ReadLine();
 
             //Application.EnableVisualStyles();
             //Form.CheckForIllegalCrossThreadCalls = false;

@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dao.Net.Client", "Dao.Net.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dao.Net.CClient", "Dao.Net.CClient\Dao.Net.CClient.csproj", "{C8DA10C7-880F-4691-A380-905EEEDFEBB3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dao.Net.App", "Dao.Net.App\Dao.Net.App.csproj", "{0A96A15A-829B-4BE7-BE7A-DE246A593310}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dao.Net.Tests", "Dao.Net.Tests\Dao.Net.Tests.csproj", "{9233B8B6-4A5E-430D-B6A3-9FCDEEFFD937}"
+EndProject
 Global
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true
@@ -36,9 +40,20 @@ Global
 		{C8DA10C7-880F-4691-A380-905EEEDFEBB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8DA10C7-880F-4691-A380-905EEEDFEBB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8DA10C7-880F-4691-A380-905EEEDFEBB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A96A15A-829B-4BE7-BE7A-DE246A593310}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A96A15A-829B-4BE7-BE7A-DE246A593310}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A96A15A-829B-4BE7-BE7A-DE246A593310}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A96A15A-829B-4BE7-BE7A-DE246A593310}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9233B8B6-4A5E-430D-B6A3-9FCDEEFFD937}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9233B8B6-4A5E-430D-B6A3-9FCDEEFFD937}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9233B8B6-4A5E-430D-B6A3-9FCDEEFFD937}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9233B8B6-4A5E-430D-B6A3-9FCDEEFFD937}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true
