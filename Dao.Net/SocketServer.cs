@@ -13,17 +13,10 @@ namespace Dao.Net {
 
         SocketListener _listener;
 
-        public SocketListener Listener
-        {
-            get { return _listener; }
-            //set { _listener = value; }
-        }
+        public SocketListener Listener { get { return _listener; } }
 
-        public event EventHandler<AcceptdEventArgs> Accepted;
-
-        public event EventHandler<ReceivedEventArgs> Received;
-
-        public event EventHandler<ClosedEventArgs> Closed;
+        SocketSessionCollection _sessions = new SocketSessionCollection();
+        public SocketSessionCollection Sessions { get { return _sessions; } }
 
         public SocketServer(SocketListener listener) {
             if (listener == null) {
@@ -47,50 +40,32 @@ namespace Dao.Net {
             _listener.StartAccept();
         }
 
-        protected virtual SocketSession GetSocketSession(Socket client) {
+        protected virtual SocketSession GetSession(Socket client) {
             return new SocketSession(client);
         }
 
-        SocketSessionCollection _sessions = new SocketSessionCollection();
-
-        public SocketSessionCollection Sessions
-        {
-            get { return _sessions; }
-        }
-
         private void OnAccepted(Socket client) {
-            SocketSession session = GetSocketSession(client);
+            SocketSession session = GetSession(client);
             OnAccepted(session);
         }
 
         protected virtual void OnAccepted(SocketSession session) {
-            session.Received += OnReceived;
             session.Closed += OnClosed;
             session.StartReceive();
             _sessions.Add(session);
 
-            Accepted?.Invoke(this, new AcceptdEventArgs(session));
+            session.Handlers?.Accept(new HandleContext { Session = session });
         }
 
-        private void OnReceived(object sender, ReceivedEventArgs e) {
-            SocketSession session = sender as SocketSession;
-            OnReceived(session, e.Pakcet);
-        }
-
-        protected virtual void OnReceived(SocketSession session, Packet packet) {
-            Received?.Invoke(this, new ReceivedEventArgs(session, packet));
-        }
         private void OnClosed(object sender, EventArgs e) {
             SocketSession session = sender as SocketSession;
             OnClosed(session);
         }
 
         protected virtual void OnClosed(SocketSession session) {
-            session.Received -= OnReceived;
             session.Closed -= OnClosed;
             _sessions.Remove(session);
-
-            Closed?.Invoke(this, new ClosedEventArgs(session));
+            session.Handlers?.Close(new HandleContext { Session = session });
         }
     }
 
@@ -123,13 +98,6 @@ namespace Dao.Net {
                 base.OnAccepted(session);
             });
         }
-
-        protected override void OnReceived(SocketSession session, Packet packet) {
-            Raise(() => {
-                base.OnReceived(session, packet);
-            });
-        }
-
         protected override void OnClosed(SocketSession session) {
             Raise(() => {
                 base.OnClosed(session);

@@ -61,6 +61,8 @@ namespace Dao.Net {
 
             if (process == null) return;
 
+            process.CancelOutputRead();
+            process.CancelErrorRead();
             process.Kill();
             process.Dispose();
 
@@ -108,7 +110,9 @@ namespace Dao.Net {
             };
 
             t.Received += (tt, s) => {
+                Console.WriteLine("Received:{0}", s);
                 callback.OnRecieve(id, s);
+                Console.WriteLine("Received callback:{0}", s);
             };
 
             t.Init();
@@ -119,6 +123,7 @@ namespace Dao.Net {
         public void Reset(int id) {
             list[id].Reset();
         }
+
     }
 
     public class TerminalCallbackService : ITermainalCallbackService {

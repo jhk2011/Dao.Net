@@ -26,15 +26,15 @@ namespace Dao.Net
 
     public class ReceivedEventArgs : EventArgs
     {
-        public ReceivedEventArgs(SocketSession session, Packet packet)
+        public ReceivedEventArgs(SocketSession session, object packet)
         {
             Session = session;
-            Pakcet = packet;
+            Packet = packet;
         }
 
         public SocketSession Session { get; private set; }
 
-        public Packet Pakcet { get; private set; }
+        public object Packet { get; private set; }
     }
 
 }

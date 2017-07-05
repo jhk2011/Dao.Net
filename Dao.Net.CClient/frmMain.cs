@@ -5,11 +5,13 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Dao.Net.CClient {
     public partial class frmMain : Form {
+
         private MySocketClient client;
 
         public frmMain() {
@@ -30,18 +32,41 @@ namespace Dao.Net.CClient {
 
             client = new MySocketClient();
 
-            await client.ConnectAsync(textBox1.Text, 1234)
-               /* .ConfigureAwait(false)*/;
-
-            client.StartReceive();
-
             client.Closed += Client_Closed;
+
+            await client.ConnectAsync(textBox1.Text, 1234);
+
+            Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
 
             button2.Enabled = false;
         }
 
         private void Client_Closed(object sender, EventArgs e) {
             button2.Enabled = true;
+        }
+
+        private void button3_Click(object sender, EventArgs e) {
+
+            ICalc calc = client.serviceClientHandler
+                .GetServiceProxy<ICalc>("calc", textBox2.Text);
+
+            var result = calc.Add(1, 2);
+
+            Console.WriteLine(result);
+
+            //client.SendAsync("test");
+            //client.SendAsync(DateTime.Now);
+            //client.SendAsync(Guid.NewGuid());
+        }
+
+        private void button4_Click(object sender, EventArgs e) {
+            var result = client.calc.Add(100, 200);
+            Console.WriteLine(result);
+        }
+
+        private async void button5_Click(object sender, EventArgs e) {
+            var result = await client.calc.AddAsync(100, 200);
+            Console.WriteLine(result);
         }
     }
 }

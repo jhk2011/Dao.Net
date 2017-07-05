@@ -38,12 +38,8 @@ namespace Dao.Net.CClient {
 
                 textBox2.Text += ss + "\r\n";
 
-                textBox2.Select(textBox2.Text.Length-1, 0);
+                textBox2.Select(textBox2.Text.Length - 1, 0);
                 textBox2.ScrollToCaret();
-
-                //Console.ForegroundColor = ConsoleColor.Green;
-                //Console.WriteLine(ss);
-                //Console.ResetColor();
             };
 
             client.TerminalCallback.Error += (idd, ss) => {
@@ -54,16 +50,19 @@ namespace Dao.Net.CClient {
 
                 textBox2.Select(textBox2.Text.Length - 1, 0);
                 textBox2.ScrollToCaret();
-
-                //Console.ForegroundColor = ConsoleColor.Red;
-                //Console.WriteLine(ss);
-                //Console.ResetColor();
             };
         }
 
         private void button1_Click(object sender, EventArgs e) {
+
             terminal.Execute(id, textBox1.Text + "\r\n");
+
             textBox1.Text = "";
+        }
+
+        protected override void OnClosed(EventArgs e) {
+            base.OnClosed(e);
+            terminal.Close(id);
         }
     }
 }

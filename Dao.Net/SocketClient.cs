@@ -12,53 +12,29 @@ namespace Dao.Net {
 
     public class SocketClient : SocketSession {
 
-        public SocketClient(PacketConverter converter) :
-            base(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp), converter) {
+        public SocketClient() :
+            base(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) {
 
         }
-        public SocketClient() : this(PacketConverter.Default) {
 
-        }
         public Task ConnectAsync(IPAddress address, int port) {
+            OnAccept();
             return Socket.ConnectTaskAsync(address, port);
         }
 
-        public Task ConnectAsync(string host, int port) {
-            return Socket.ConnectTaskAsync(host, port);
+        public async Task ConnectAsync(string host, int port) {
+            OnAccept();
+            await Socket.ConnectTaskAsync(host, port);
+            StartReceive();
         }
 
         public Task DisconnectAsync() {
             return Socket.DisconnectTaskAsync(true);
         }
-
-        protected override void OnReceived(Packet packet) {
-            base.OnReceived(packet);
-        }
     }
 
 
-    public class TaskSocketClient : SocketClient {
-
-        protected virtual void Raise(Action action) {
-            if (action == null) {
-                throw new ArgumentNullException("action");
-            }
-            Task.Factory.StartNew(action);
-        }
-
-        protected override void OnReceived(Packet packet) {
-            Raise(() => {
-                base.OnReceived(packet);
-            });
-        }
-
-        protected override void OnClosed() {
-            Raise(() => {
-                base.OnClosed();
-            });
-        }
-    }
-    public class SyncSocketClient : TaskSocketClient {
+    public class SyncSocketClient : SocketClient {
 
         SynchronizationContext _synchronizationContext = SynchronizationContext.Current;
 

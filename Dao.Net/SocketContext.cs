@@ -18,7 +18,7 @@ namespace Dao.Net {
             }
         }
 
-        public Packet Packet { get; set; }
+        public object Packet { get; set; }
 
         public SocketSession Session { get; set; }
 

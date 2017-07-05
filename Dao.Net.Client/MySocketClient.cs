@@ -7,57 +7,19 @@ using System.Text;
 namespace Dao.Net.Client {
 
 
-    class MySocketClient : TaskSocketClient {
-
-        public UserManager UserManager { get; set; }
-        public FileManager FileManager { get; set; }
-
-        public TerminalClientManager TerminalManager { get; set; }
+    class MySocketClient : SocketClient {
 
 
         public MySocketClient() {
-            this.Handlers = new PacketHandlerCollection();
+
+            ServiceHandler serviceHandler = new ServiceHandler();
 
             this.Handlers.Add(new SocketClientHandler());
 
-            //SystemManager systemManager = new SystemManager {
-            //    Session = this
-            //};
-            //systemManager.Join += OnJoin;
-            //systemManager.Leave += OnLeave;
+            serviceHandler.AddService("calc", new Calc());
 
-            //this.Handlers.Add(systemManager);
+            this.Handlers.Add(serviceHandler);
 
-            UserManager = new UserManager() { Session = this };
-
-            //FileManager = new FileManager(this);
-            TerminalManager = new TerminalClientManager { Session = this };
-
-            this.Handlers.Add(UserManager);
-            //this.Handlers.Add(FileManager);
-
-            this.Handlers.Add(TerminalManager);
-
-            this.Handlers.Add(new TerminalServerManager() {
-                Session = this
-            });
-
-            var serviceManager = new ServiceManager {
-                Session = this
-            };
-
-            serviceManager.AddService("calcCallback", new CalcCallback());
-
-            serviceManager.AddService("terminalCallback", new TerminalCallbackService());
-
-            this.Handlers.Add(serviceManager);
-
-        }
-
-
-
-        protected override void OnReceived(Packet packet) {
-            base.OnReceived(packet);
         }
     }
 }

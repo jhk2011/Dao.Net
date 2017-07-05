@@ -9,16 +9,12 @@ namespace Dao.Net.CClient {
     static class Program {
 
         static void Main() {
-           
-            //Stopwatch w = Stopwatch.StartNew();
 
-            //var result = client.calc.Add(100, 200);
+            Console.WriteLine("CClient");
 
-            //w.Stop();
+            //NewMethod();
 
-            //Console.WriteLine("ElapsedMilliseconds:{0}", w.ElapsedMilliseconds);
-
-            //Console.WriteLine(result);
+            //Console.ReadLine();
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -29,5 +25,15 @@ namespace Dao.Net.CClient {
 
         }
 
+        private async static void NewMethod() {
+
+            var client = new MySocketClient();
+
+            await client.ConnectAsync("127.0.0.1", 1234);
+
+            var result = client.calc.Add(100, 200);
+
+            Console.WriteLine(result);
+        }
     }
 }

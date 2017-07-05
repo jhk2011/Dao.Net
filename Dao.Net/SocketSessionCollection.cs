@@ -9,6 +9,7 @@ namespace Dao.Net
 {
     public class SocketSessionCollection : Collection<SocketSession>
     {
+
         object _syncObj = new object();
 
         protected override void InsertItem(int index, SocketSession item)
@@ -39,12 +40,6 @@ namespace Dao.Net
             lock (_syncObj)
             {
                 base.ClearItems();
-            }
-        }
-
-        public void Broadcast(Packet packet) {
-            foreach (var item in this) {
-                item.SendAsync(packet);
             }
         }
 

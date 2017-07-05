@@ -10,11 +10,24 @@ namespace Dao.Net.Client {
     class Program {
         static void Main(string[] args) {
 
-            Application.EnableVisualStyles();
-            Form.CheckForIllegalCrossThreadCalls = false;
-            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
-            Application.ThreadException += Application_ThreadException;
-            Application.Run(new frmUsers());
+            F();
+
+            Console.ReadLine();
+
+            //Application.EnableVisualStyles();
+            //Form.CheckForIllegalCrossThreadCalls = false;
+            //Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+            //Application.ThreadException += Application_ThreadException;
+            //Application.Run(new frmUsers());
+        }
+
+        private async static void F() {
+
+            Console.WriteLine("Client");
+            MySocketClient client = new MySocketClient();
+
+            await client.ConnectAsync("127.0.0.1", 1234);
+
         }
 
         private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e) {

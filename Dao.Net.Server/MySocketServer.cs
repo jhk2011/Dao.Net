@@ -8,24 +8,12 @@ namespace Dao.Net.Server {
         }
 
         public MySocketServer(SocketListener l) : base(l) {
-
+            
         }
 
-        protected override SocketSession GetSocketSession(Socket client) {
+        protected override SocketSession GetSession(Socket client) {
             return new MyServerSession(client, this);
         }
 
-        protected override void OnAccepted(SocketSession session) {
-            base.OnAccepted(session);
-        }
-
-        protected override void OnClosed(SocketSession session) {
-
-            base.OnClosed(session);
-        }
-
-        protected override void OnReceived(SocketSession session, Packet packet) {
-            base.OnReceived(session, packet);
-        }
     }
 }

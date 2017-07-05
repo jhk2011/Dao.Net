@@ -9,38 +9,33 @@ namespace Dao.Net.Server {
 
     class MyServerSession : SocketSession {
 
-        public MySocketServer Server { get; set; }
-
         public MyServerSession(Socket socket, MySocketServer server) : base(socket) {
 
-            Server = server;
+            Handlers.Add(new TransferHandler() { Server = server });
 
-            this.Handlers = new SocketHandlerCollection();
-
-            ServiceProxyManager proxyManager = new ServiceProxyManager() {
+            ServiceClientHandler serviceClientHandler = new ServiceClientHandler() {
                 Session = this
             };
 
-            ServiceManager serviceManager = new ServiceManager();
+            ServiceHandler serviceManager = new ServiceHandler();
 
-            ICalcTip tip = proxyManager.GetServiceProxy<ICalcTip>("calct");
+            ICalcback calcCallback = serviceClientHandler.GetServiceProxy<ICalcback>("calcc");
 
-            this.Handlers.Add(proxyManager);
+            this.Handlers.Add(serviceClientHandler);
 
             serviceManager.AddService("calc", new Calc() {
-                tip = tip
+                callback = calcCallback
             });
 
-            ITermainalCallbackService callback = proxyManager.GetServiceProxy<ITermainalCallbackService>("tc");
+            ITermainalCallbackService callback = serviceClientHandler
+                .GetServiceProxy<ITermainalCallbackService>("tc");
 
             serviceManager.AddService("t", new TerminalService(callback));
 
             Handlers.Add(serviceManager);
+
+            Handlers.Add(new MyServerHandler());
         }
 
-        protected override void OnReceived(Packet packet) {
-            base.OnReceived(packet);
-            //System.Console.WriteLine("OnReceived:{0}", packet.Type);
-        }
     }
 }

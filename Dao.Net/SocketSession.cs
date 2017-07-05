@@ -15,46 +15,73 @@ namespace Dao.Net {
     public class SocketSession {
 
         Socket _socket;
-        IPacketConverter _converter;
+
+        ISocketConverter _converter;
 
         public Socket Socket
         {
             get { return _socket; }
-            private set { _socket = value; }
         }
 
-        public SocketSession(Socket socket, IPacketConverter converter) {
+        public static int I { get; set; }
+
+        public SocketSession(Socket socket) {
             _socket = socket ?? throw new ArgumentNullException(nameof(socket));
-            _converter = converter ?? throw new ArgumentNullException(nameof(converter));
+            Id = (I++) + "";
+            Console.WriteLine("SessionId:{0}", Id);
         }
 
-        public SocketSession(Socket socket) : this(socket, PacketConverter.Default) {
-
+        public async Task Close() {
+            await _socket.DisconnectTaskAsync(false);
+            _socket.Close();
         }
+
+        public string Id { get; private set; }
 
         public event EventHandler<ReceivedEventArgs> Received;
 
         public event EventHandler Closed;
 
-        public SocketHandlerCollection Handlers { get; set; }
+        public event EventHandler Accepted;
 
-        public async Task SendAsync(Packet packet) {
-            if (packet == null) throw new ArgumentNullException("buffer");
-            await _converter.SendAsync(this, packet);
+        SocketHandlerCollection handlers = new SocketHandlerCollection();
+
+        public SocketHandlerCollection Handlers { get { return handlers; } }
+
+        public async Task SendAsync(object packet) {
+
+            if (packet == null) throw new ArgumentNullException("packet");
+
+            HandleContext context = new HandleContext {
+                Session = this,
+                Packet = packet
+            };
+
+            Handlers.Send(context);
+
+
+            await GetConverter().WriteAsync(context.Packet);
         }
 
-        public async Task<Packet> ReceiveAsync() {
-            return await _converter.ReceiveAsync(this);
+        public Task<object> ReceiveAsync() {
+            return GetConverter().ReadAsync();
+        }
+
+        protected virtual ISocketConverter GetConverter() {
+            if (_converter == null) {
+                _converter = new SocketConverter(this);
+            }
+            return _converter;
         }
 
         public async void StartReceive() {
 
-            Packet packet = null;
+            object packet = null;
             try {
                 packet = await ReceiveAsync();
             } catch (Exception ex) {
                 Console.WriteLine("Receive Error:{0}", ex.Message);
-                Console.WriteLine(ex.StackTrace);
+                //Console.WriteLine(ex.StackTrace);
                 OnClosed();
             }
             if (packet != null) {
@@ -63,31 +90,34 @@ namespace Dao.Net {
             }
         }
 
-        protected virtual void OnReceived(Packet packet) {
-            Task.Factory.StartNew(() => {
-                try {
-                    SocketContext.Current = new SocketContext {
-                        Packet = packet,
-                        Session = this
-                    };
+        protected virtual void Raise(Action action) {
+            Task.Factory.StartNew(action);
+        }
 
-                    HandleContext context = new HandleContext {
-                        Packet = packet,
-                        Session = this
-                    };
+        protected virtual void OnReceived(object packet) {
+            Raise(() => {
+                HandleContext context = new HandleContext {
+                    Packet = packet,
+                    Session = this
+                };
 
-                    Received?.Invoke(this, new ReceivedEventArgs(this, packet));
-
-                    Handlers?.Handle(context);
-
-                } finally {
-                    SocketContext.Current = null;
-                }
+                Handlers?.Handle(context);
+                Received?.Invoke(this, new ReceivedEventArgs(this, packet));
             });
         }
 
         protected virtual void OnClosed() {
-            Closed?.Invoke(this, EventArgs.Empty);
+            Raise(() => {
+                Handlers?.Close(new HandleContext { Session = this });
+                Closed?.Invoke(this, EventArgs.Empty);
+            });
+        }
+
+        protected virtual void OnAccept() {
+            Raise(() => {
+                Handlers?.Accept(new HandleContext { Session = this });
+                Accepted?.Invoke(this, EventArgs.Empty);
+            });
         }
     }
 

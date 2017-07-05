@@ -40,7 +40,7 @@ namespace Dao.Net {
             Socket client = null;
 
             try {
-                client = await this.AcceptAsync().ConfigureAwait(false);
+                client = await this.AcceptAsync();
             } catch (Exception ex) {
                 Console.WriteLine("Accept Error:{0}", ex.Message);
                 OnError(ex);

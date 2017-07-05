@@ -4,21 +4,25 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Dao.Net {
 
     public class ServiceProxy : BaseRealProxy {
 
-
         public string ServiceName { get; set; }
 
-        public ServiceProxyManager ServiceProxyManager { get; set; }
+        public ServiceClientHandler ServiceHandler { get; set; }
 
-        public ServiceProxy(Type type, ServiceProxyManager serviceProxyManager, string serviceName)
+        public string UserId { get; set; }
+        public ServiceProxy(Type type,
+            ServiceClientHandler serviceHandler,
+            string serviceName, string userId)
             : base(type) {
 
-            ServiceProxyManager = serviceProxyManager;
+            ServiceHandler = serviceHandler;
             ServiceName = serviceName;
+            UserId = userId;
         }
 
         public override void OnInvoke(InvocationContext context) {
@@ -26,19 +30,29 @@ namespace Dao.Net {
             var method = context.Method as MethodInfo;
 
             ServiceInvoke info = new ServiceInvoke {
+                Id = Guid.NewGuid(),
                 Name = ServiceName,
                 Action = context.Method.Name,
                 Arguments = context.Arguments,
-                Id = Guid.NewGuid()
+                DestUserId = UserId
             };
 
-            Packet p = new Packet(ServicePackets.Invoke);
+            Type returnType = method.ReturnType;
 
-            p.SetObject(info);
+            if (typeof(Task).IsAssignableFrom(returnType)) {
 
-            context.Return = ServiceProxyManager.Invoke(info);
+                Type type = returnType.GetGenericArguments()[0];
 
+                context.Return = ServiceHandler.GetType()
+                    .GetMethod("InvokeTaskAsync2")
+                    .MakeGenericMethod(type)
+                    .Invoke(ServiceHandler, new object[] { info });
+
+            } else {
+                context.Return = ServiceHandler.Invoke(info);
+            }
         }
+
     }
 
 }

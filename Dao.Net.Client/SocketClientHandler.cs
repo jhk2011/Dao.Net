@@ -1,9 +1,9 @@
 ﻿using System;
 
 namespace Dao.Net.Client {
-    public class SocketClientHandler : ISocketHandler {
-        public  void Handle(Packet packet, SocketSession session) {
-            Console.WriteLine(packet.Type);
+    public class SocketClientHandler : SocketHandler {
+        public override void Handle(HandleContext context) {
+            Console.WriteLine(context.Packet.GetType().FullName);
         }
     }
 }

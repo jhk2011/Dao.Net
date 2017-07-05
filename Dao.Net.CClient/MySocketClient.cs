@@ -1,5 +1,5 @@
 ﻿namespace Dao.Net.CClient {
-    public class MySocketClient : SocketClient {
+    public class MySocketClient : SyncSocketClient {
 
         public ICalc calc;
 
@@ -7,35 +7,34 @@
 
         public TerminalCallbackService TerminalCallback { get; set; }
 
+        public ServiceClientHandler serviceClientHandler;
         public MySocketClient() {
 
-            this.Handlers = new SocketHandlerCollection();
+            ServiceHandler serviceManager = new ServiceHandler();
 
-            ServiceManager serviceManager = new ServiceManager();
-
-            serviceManager.AddService("calct", new CalcTip());
+            serviceClientHandler = new ServiceClientHandler() {
+                Session = this
+            };
 
             this.Handlers.Add(serviceManager);
 
-            var serviceProxyManager = new ServiceProxyManager() {
-                Session = this
-            };
+            this.Handlers.Add(serviceClientHandler);
+
+           
+
 
             TerminalCallback = new TerminalCallbackService();
 
             serviceManager.AddService("tc", TerminalCallback);
 
-            calc = serviceProxyManager.GetServiceProxy<ICalc>("calc");
+            Terminal = serviceClientHandler.GetServiceProxy<ITerminalService>("t");
 
-           
-            Terminal = serviceProxyManager.GetServiceProxy<ITerminalService>("t");
 
-            this.Handlers.Add(serviceProxyManager);
+            serviceManager.AddService("calcc", new CalcCallback());
+
+            calc = serviceClientHandler.GetServiceProxy<ICalc>("calc");
+
         }
 
-        protected override void OnReceived(Packet packet) {
-            base.OnReceived(packet);
-            System.Console.WriteLine("--收到:{0}",packet.Type);
-        }
     }
 }

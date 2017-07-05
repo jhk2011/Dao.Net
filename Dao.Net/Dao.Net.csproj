@@ -46,25 +46,34 @@
   <ItemGroup>
     <Compile Include="Calc.cs" />
     <Compile Include="HandleContext.cs" />
-    <Compile Include="IPacketConverter.cs" />
-    <Compile Include="ISocketHandler.cs" />
-    <Compile Include="Packet.cs" />
-    <Compile Include="PacketConverter.cs" />
-    <Compile Include="PacketHandlerCollection.cs" />
+    <Compile Include="TransferHandler.cs" />
+    <Compile Include="Web\HttpHandler.cs" />
+    <Compile Include="Web\HttpHeader.cs" />
+    <Compile Include="Web\HttpHeaderCollection.cs" />
+    <Compile Include="Web\HttpHeaderParser.cs" />
+    <Compile Include="Web\HttpHeaders.cs" />
+    <Compile Include="Web\HttpRequest.cs" />
+    <Compile Include="Web\HttpResponse.cs" />
+    <Compile Include="Web\HttpConverter.cs" />
+    <Compile Include="ServiceClientHandler.cs" />
+    <Compile Include="ServiceHandler.cs" />
+    <Compile Include="SocketConverter.cs" />
+    <Compile Include="SocketHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RealProxy.cs" />
-    <Compile Include="ServiceManager.cs" />
     <Compile Include="ServiceProxy.cs" />
-    <Compile Include="ServiceProxyManager.cs" />
     <Compile Include="SocketClient.cs" />
     <Compile Include="SocketContext.cs" />
     <Compile Include="SocketEventArgs.cs" />
     <Compile Include="SocketExtensions.cs" />
+    <Compile Include="SocketHandlerCollection.cs" />
     <Compile Include="SocketListener.cs" />
     <Compile Include="SocketServer.cs" />
     <Compile Include="SocketSession.cs" />
     <Compile Include="SocketSessionCollection.cs" />
-    <Compile Include="T.cs" />
+    <Compile Include="StreamExtensions.cs" />
+    <Compile Include="Terminal.cs" />
+    <Compile Include="SocketModels.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
