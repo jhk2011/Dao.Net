@@ -2,11 +2,13 @@
 using System.Diagnostics;
 
 namespace Dao.Net {
-    public class Terminal {
+    public class Terminal:IDisposable {
 
         Process process;
 
         public void Init() {
+
+            if (process != null) return;
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = "cmd.exe";
@@ -68,6 +70,11 @@ namespace Dao.Net {
             process.Dispose();
 
             process = null;
+        }
+
+        public void Dispose() {
+            Console.WriteLine("--Dispose");
+            Close();
         }
     }
 

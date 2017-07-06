@@ -12,9 +12,7 @@
 
             ServiceHandler serviceManager = new ServiceHandler();
 
-            serviceClientHandler = new ServiceClientHandler() {
-                Session = this
-            };
+            serviceClientHandler = new ServiceClientHandler();
 
             this.Handlers.Add(serviceManager);
 

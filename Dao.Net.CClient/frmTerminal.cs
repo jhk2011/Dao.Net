@@ -31,17 +31,11 @@ namespace Dao.Net.CClient {
             this.client = client;
 
             terminal = client.serviceClientHandler
-                .GetServiceProxy<ITerminalServcie3>("terminal", "0","");
+                .GetServiceProxy<ITerminalServcie3>("terminal", "0",Guid.NewGuid()+"");
 
             terminal.Received += Terminal2_Received;
             terminal.Error += Terminal2_Error;
             terminal.Closed += Terminal_Closed;
-
-            //terminal = client.Terminal;
-
-            //client.TerminalCallback.Receive += Terminal2_Received;
-
-            //client.TerminalCallback.Error += Terminal2_Error;
         }
 
         private void Terminal_Closed() {
@@ -69,8 +63,7 @@ namespace Dao.Net.CClient {
         }
 
         private void Execute() {
-            terminal.Execute(textBox1.Text + "\r\n" + "\r\n");
-
+            terminal.Execute(textBox1.Text + "\r\n");
             textBox1.Text = "";
         }
 

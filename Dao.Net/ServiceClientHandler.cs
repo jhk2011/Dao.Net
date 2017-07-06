@@ -7,6 +7,12 @@ using System.Windows.Forms;
 namespace Dao.Net {
     public class ServiceClientHandler : SocketHandler {
 
+        SocketSession session;
+
+        public override void Accept(HandleContext context) {
+            session = context.Session;
+        }
+
         public override void Handle(HandleContext context) {
 
             var packet = context.Packet;
@@ -30,8 +36,6 @@ namespace Dao.Net {
             }
         }
 
-        public SocketSession Session { get; set; }
-
         public T GetServiceProxy<T>(string service, string userid = null, string instance = null)
             where T : class {
             ServiceProxy proxy = new ServiceProxy(typeof(T), this, service, userid, instance);
@@ -42,7 +46,7 @@ namespace Dao.Net {
 
             Console.WriteLine("发起调用{0}.{1}", info.Name, info.Action);
 
-            await Session.SendAsync(info);
+            await session.SendAsync(info);
         }
 
         public event Action<IResponse> Invoked;
@@ -123,7 +127,7 @@ namespace Dao.Net {
         }
 
         public async void Subscribe(Subscribe info) {
-            await Session.SendAsync(info);
+            await session.SendAsync(info);
         }
     }
 

@@ -77,16 +77,22 @@ namespace Dao.Net {
         public async void StartReceive() {
 
             object packet = null;
-            try {
-                packet = await ReceiveAsync();
-            } catch (Exception ex) {
-                Console.WriteLine("Receive Error:{0}", ex.Message);
-                //Console.WriteLine(ex.StackTrace);
-                OnClosed();
-            }
-            if (packet != null) {
-                OnReceived(packet);
-                StartReceive();
+
+            OnAccept();
+
+            while (true) {
+                try {
+                    packet = await ReceiveAsync();
+                } catch (Exception ex) {
+                    Console.WriteLine("Receive Error:{0}", ex.Message);
+                    //Console.WriteLine(ex.StackTrace);
+                    OnClosed();
+                    break;
+                }
+                if (packet != null) {
+                    OnReceived(packet);
+                    //StartReceive();
+                }
             }
         }
 

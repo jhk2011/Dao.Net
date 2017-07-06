@@ -65,7 +65,7 @@ namespace Dao.Net {
         protected virtual void OnClosed(SocketSession session) {
             session.Closed -= OnClosed;
             _sessions.Remove(session);
-            session.Handlers?.Close(new HandleContext { Session = session });
+            //session.Handlers?.Close(new HandleContext { Session = session });
         }
     }
 

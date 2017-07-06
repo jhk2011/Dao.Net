@@ -13,9 +13,7 @@ namespace Dao.Net.Server {
 
             Handlers.Add(new TransferHandler() { Server = server });
 
-            ServiceClientHandler serviceClientHandler = new ServiceClientHandler() {
-                Session = this
-            };
+            ServiceClientHandler serviceClientHandler = new ServiceClientHandler();
 
             ServiceHandler serviceManager = new ServiceHandler();
 

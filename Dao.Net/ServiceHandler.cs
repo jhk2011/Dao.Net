@@ -7,11 +7,6 @@ using System.Threading.Tasks;
 
 namespace Dao.Net {
 
-    public interface IService {
-        void OnClose();
-        void OnAccept();
-    }
-
     [Serializable]
     public class ServiceInvoke : ITransferable {
         public Guid Id { get; set; }
@@ -152,22 +147,21 @@ namespace Dao.Net {
     public class ServiceHandler : SocketHandler {
 
         public override void Close(HandleContext context) {
-            foreach (var service in services) {
-                IService iservice = service.Value as IService;
-                iservice?.OnClose();
+            foreach (var def in serviceDefs) {
+                foreach (var instance in def.Value.Instances) {
+                    var dispose = instance.Value.Service as IDisposable;
+
+                    if (dispose != null) {
+                        dispose.Dispose();
+                    }
+                }
             }
         }
 
         SocketSession session = null;
 
         public override void Accept(HandleContext context) {
-
             session = context.Session;
-
-            foreach (var service in services) {
-                IService iservice = service.Value as IService;
-                iservice?.OnAccept();
-            }
         }
 
         public override async void Handle(HandleContext context) {
@@ -205,16 +199,18 @@ namespace Dao.Net {
             }
         }
 
-        Dictionary<string, object> services = new Dictionary<string, object>();
-
         Dictionary<string, ServiceDef> serviceDefs = new Dictionary<string, ServiceDef>();
 
-        public void AddService(string name, object service) {
+        public void AddService(string name, object service, string instance = null) {
+
+            if (string.IsNullOrEmpty(instance)) {
+                instance = "";
+            }
 
             ServiceDef def = new ServiceDef {
                 Instances = new Dictionary<string, ServiceInstance> {
-                    [""] = new ServiceInstance {
-                        Id = "",
+                    [instance] = new ServiceInstance {
+                        Id = instance,
                         Service = service
                     }
                 },
@@ -223,8 +219,7 @@ namespace Dao.Net {
 
             serviceDefs.Add(name, def);
 
-            //services.Add(name, service);
-            AddEventHandler(name, service, "");
+            AddEventHandler(name, service, instance);
         }
 
         private void AddEventHandler(string name, object service, string instance) {
@@ -246,6 +241,7 @@ namespace Dao.Net {
             };
             serviceDefs.Add(name, def);
         }
+
         public object GetService(string name, string instanceId = null) {
 
             if (string.IsNullOrEmpty(instanceId)) {
@@ -253,11 +249,6 @@ namespace Dao.Net {
             }
 
             object service = null;
-
-
-            if (services.TryGetValue(name, out service)) {
-                return service;
-            }
 
             ServiceDef def = null;
 
@@ -274,9 +265,12 @@ namespace Dao.Net {
                     service = def.ServiceLoader();
 
                     instance = new ServiceInstance {
+                        Id = instanceId,
                         Service = service
                     };
+
                     def.Instances.Add(instanceId, instance);
+
                     AddEventHandler(name, service, instanceId);
                 }
                 return instance.Service;
