@@ -52,7 +52,7 @@ namespace Dao.Net.Client {
 
             serviceHandler.AddService("calc2", new Calc2());
 
-            serviceHandler.AddService("terminal", new TerminalService2());
+            serviceHandler.AddService("terminal", () => new TerminalService3());
 
             this.Handlers.Add(serviceHandler);
 

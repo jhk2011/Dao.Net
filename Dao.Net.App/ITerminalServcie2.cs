@@ -15,6 +15,23 @@ namespace Dao.Net {
         event Action<int> Closed;
     }
 
+    public interface ITerminalServcie3 {
+        void Init();
+        void Execute(string command);
+        void Reset();
+        void Close();
+
+        event Action<string> Error;
+
+        event Action<string> Received;
+
+        event Action Closed;
+    }
+
+    public class TerminalService3 : Terminal, ITerminalServcie3 {
+
+    }
+
     public class TerminalService2 : ITerminalServcie2 {
 
         public event Action<int, string> Error;

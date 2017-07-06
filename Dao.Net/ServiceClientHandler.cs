@@ -32,9 +32,9 @@ namespace Dao.Net {
 
         public SocketSession Session { get; set; }
 
-        public T GetServiceProxy<T>(string service, string userid = null)
+        public T GetServiceProxy<T>(string service, string userid = null, string instance = null)
             where T : class {
-            ServiceProxy proxy = new ServiceProxy(typeof(T), this, service, userid);
+            ServiceProxy proxy = new ServiceProxy(typeof(T), this, service, userid, instance);
             return proxy.GetTransparentProxy() as T;
         }
 

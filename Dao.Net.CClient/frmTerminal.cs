@@ -13,12 +13,9 @@ namespace Dao.Net.CClient {
 
         MySocketClient client;
 
-        ITerminalService t;
 
-        ITerminalServcie2 terminal;
+        ITerminalServcie3 terminal;
 
-
-        int id;
 
         public frmTerminal() {
             InitializeComponent();
@@ -27,17 +24,18 @@ namespace Dao.Net.CClient {
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
 
-            id = terminal.Init();
+            terminal.Init();
         }
 
         internal void Init(MySocketClient client) {
             this.client = client;
 
             terminal = client.serviceClientHandler
-                .GetServiceProxy<ITerminalServcie2>("terminal","0");
+                .GetServiceProxy<ITerminalServcie3>("terminal", "0","");
 
             terminal.Received += Terminal2_Received;
             terminal.Error += Terminal2_Error;
+            terminal.Closed += Terminal_Closed;
 
             //terminal = client.Terminal;
 
@@ -46,8 +44,11 @@ namespace Dao.Net.CClient {
             //client.TerminalCallback.Error += Terminal2_Error;
         }
 
-        private void Terminal2_Error(int idd, string ss) {
-            if (idd != id) return;
+        private void Terminal_Closed() {
+                MessageBox.Show("关闭");
+        }
+
+        private void Terminal2_Error(string ss) {
 
             textBox2.Text += ss + "\r\n";
 
@@ -55,8 +56,7 @@ namespace Dao.Net.CClient {
             textBox2.ScrollToCaret();
         }
 
-        private void Terminal2_Received(int idd, string ss) {
-            if (idd != id) return;
+        private void Terminal2_Received(string ss) {
 
             textBox2.Text += ss + "\r\n";
 
@@ -69,14 +69,14 @@ namespace Dao.Net.CClient {
         }
 
         private void Execute() {
-            terminal.Execute(id, textBox1.Text + "\r\n" + "\r\n");
+            terminal.Execute(textBox1.Text + "\r\n" + "\r\n");
 
             textBox1.Text = "";
         }
 
         protected override void OnClosed(EventArgs e) {
             base.OnClosed(e);
-            terminal.Close(id);
+            terminal.Close();
         }
 
         private void textBox1_KeyDown(object sender, KeyEventArgs e) {

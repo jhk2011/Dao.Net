@@ -14,6 +14,11 @@ namespace Dao.Net.Client {
             InitializeComponent();
         }
 
+        protected override void OnLoad(EventArgs e) {
+            base.OnLoad(e);
+            button1_Click(null,null);
+        }
+
         MySocketClient client;
         private async void button1_Click(object sender, EventArgs e) {
 

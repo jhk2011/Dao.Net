@@ -9,36 +9,40 @@ using System.Threading.Tasks;
 namespace Dao.Net {
 
     public class ServiceProxy : EventRealProxy {
+        public ServiceClientHandler ServiceClientHandler { get; set; }
 
         public string ServiceName { get; set; }
 
-        public ServiceClientHandler ServiceHandler { get; set; }
+        public string Instance { get; set; }
 
         public string UserId { get; set; }
         public ServiceProxy(Type type,
             ServiceClientHandler serviceHandler,
-            string serviceName, string userId)
+            string serviceName, string userId, string instance = null)
             : base(type) {
 
-            ServiceHandler = serviceHandler;
+            ServiceClientHandler = serviceHandler;
             ServiceName = serviceName;
             UserId = userId;
-            ServiceHandler.Raised += ServiceHandler_Raised;
+            Instance = instance;
+
+            ServiceClientHandler.Raised += ServiceHandler_Raised;
         }
 
         private void ServiceHandler_Raised(EventInfo obj) {
-            if (obj.Name == ServiceName) {
+            if (obj.Name == ServiceName && obj.Instance == Instance) {
                 Raise(obj.Event, obj.Arguemnts);
             }
         }
 
         protected override void OnAddHandler(InvocationContext context, string name, object key) {
-            ServiceHandler.Subscribe(new Subscribe {
-                Id = Guid.NewGuid(),
-                Name = ServiceName,
-                Action = name,
-                DestUserId = UserId
-            });
+            //ServiceClientHandler.Subscribe(new Subscribe {
+            //    Id = Guid.NewGuid(),
+            //    Name = ServiceName,
+            //    Action = name,
+            //    DestUserId = UserId,
+            //    Instance = Instance
+            //});
         }
 
         protected override void OnRemoveHandler(InvocationContext context, string name, object key) {
@@ -54,7 +58,8 @@ namespace Dao.Net {
                 Name = ServiceName,
                 Action = context.Method.Name,
                 Arguments = context.Arguments,
-                DestUserId = UserId
+                Instance = Instance,
+                DestUserId = UserId,
             };
 
             Type returnType = method.ReturnType;
@@ -63,13 +68,13 @@ namespace Dao.Net {
 
                 Type type = returnType.GetGenericArguments()[0];
 
-                context.Return = ServiceHandler.GetType()
+                context.Return = ServiceClientHandler.GetType()
                     .GetMethod("InvokeTaskAsync2")
                     .MakeGenericMethod(type)
-                    .Invoke(ServiceHandler, new object[] { info });
+                    .Invoke(ServiceClientHandler, new object[] { info });
 
             } else {
-                context.Return = ServiceHandler.Invoke(info);
+                context.Return = ServiceClientHandler.Invoke(info);
             }
         }
 

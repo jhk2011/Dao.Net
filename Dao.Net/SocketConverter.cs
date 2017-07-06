@@ -31,17 +31,15 @@ namespace Dao.Net {
 
             int length = BitConverter.ToInt32(buffer, 0);
 
-            Console.WriteLine("读取长度{0}", length);
-
             buffer = await ns.ReadAllAsync(length);
-
-            Console.WriteLine("读取内容{0}", length);
 
             BinaryFormatter formatter = new BinaryFormatter();
 
             using (MemoryStream ms = new MemoryStream(buffer)) {
                 object obj = formatter.Deserialize(ms);
-                Console.WriteLine("读取对象类型:{0}", obj.GetType().Name);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("读取对象:{0}\n{0}", obj.GetType().Name, obj);
+                Console.ResetColor();
                 return obj;
             }
         }
@@ -72,11 +70,11 @@ namespace Dao.Net {
 
                     await ms2.CopyToAsync(ns);
 
-                    Console.WriteLine("发送长度{0}", length);
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("发送对象:{0}\n{1}", packet.GetType().Name, packet);
+                    Console.ResetColor();
 
-                    Console.WriteLine("发送内容{0}", length);
-
-                    Console.WriteLine("发送对象类型:{0}", packet.GetType().Name);
+                    
                 }
 
             }
