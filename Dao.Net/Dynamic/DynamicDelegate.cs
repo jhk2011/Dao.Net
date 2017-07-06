@@ -21,12 +21,13 @@ namespace Dao.Net.Dynamic
         {
             return CreateDelegate(typeof(T), action) as T;
         }
-
     }
-    public class MyClass
+
+
+    public class DynamicDelegateDemo
     {
 
-        public MyClass(Action<object[]> handler)
+        public DynamicDelegateDemo(Action<object[]> handler)
         {
             this.handler = handler;
         }

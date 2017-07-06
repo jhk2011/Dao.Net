@@ -36,7 +36,7 @@ namespace Dao.Net {
             _socket.Close();
         }
 
-        public string Id { get; private set; }
+        public string Id { get; protected set; }
 
         public event EventHandler<ReceivedEventArgs> Received;
 

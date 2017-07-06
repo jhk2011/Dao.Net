@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dao.Net {
     public class Terminal {
@@ -27,12 +22,17 @@ namespace Dao.Net {
             process.StartInfo = startInfo;
             process.Start();
 
-            //process.EnableRaisingEvents = true;
 
+            process.Exited += Process_Exited;
+            process.EnableRaisingEvents = true;
             process.ErrorDataReceived += Process_ErrorDataReceived;
             process.OutputDataReceived += Process_OutputDataReceived;
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
+        }
+
+        private void Process_Exited(object sender, EventArgs e) {
+            Closed?.Invoke();
         }
 
         public void Execute(string commad) {
@@ -45,16 +45,17 @@ namespace Dao.Net {
         }
 
 
-        public event Action<Terminal, String> Received;
+        public event Action<String> Received;
 
-        public event Action<Terminal, String> Error;
+        public event Action<String> Error;
 
+        public event Action Closed;
         private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e) {
-            Received?.Invoke(this, e.Data);
+            Received?.Invoke(e.Data);
         }
 
         private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e) {
-            Error?.Invoke(this, e.Data);
+            Error?.Invoke(e.Data);
         }
 
         public void Close() {
@@ -68,81 +69,6 @@ namespace Dao.Net {
 
             process = null;
         }
-    }
-
-    public interface ITerminalService {
-        int Init();
-        void Execute(int id, string command);
-        void Reset(int id);
-        void Close(int id);
-    }
-
-    public class TerminalService : ITerminalService {
-
-        ITermainalCallbackService callback;
-
-        public TerminalService(ITermainalCallbackService callback) {
-            this.callback = callback;
-        }
-
-
-        List<Terminal> list = new List<Terminal>();
-
-        public void Close(int id) {
-            list[id].Close();
-        }
-
-        public void Execute(int id, string command) {
-
-            list[id].Execute(command);
-        }
-
-        public int Init() {
-
-            Terminal t = new Terminal();
-
-            int id = list.Count;
-
-            list.Add(t);
-
-            t.Error += (tt, s) => {
-                callback.OnError(id, s);
-            };
-
-            t.Received += (tt, s) => {
-                Console.WriteLine("Received:{0}", s);
-                callback.OnRecieve(id, s);
-                Console.WriteLine("Received callback:{0}", s);
-            };
-
-            t.Init();
-
-            return id;
-        }
-
-        public void Reset(int id) {
-            list[id].Reset();
-        }
-
-    }
-
-    public class TerminalCallbackService : ITermainalCallbackService {
-
-        public event Action<int, string> Error;
-
-        public event Action<int, string> Receive;
-
-        public void OnError(int id, string s) {
-            Error?.Invoke(id, s);
-        }
-
-        public void OnRecieve(int id, string s) {
-            Receive?.Invoke(id, s);
-        }
-    }
-    public interface ITermainalCallbackService {
-        void OnError(int id, string s);
-        void OnRecieve(int id, string s);
     }
 
 }

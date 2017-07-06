@@ -121,6 +121,10 @@ namespace Dao.Net {
 
             throw new InvalidOperationException(result.Message);
         }
+
+        public async void Subscribe(Subscribe info) {
+            await Session.SendAsync(info);
+        }
     }
 
 }

@@ -13,7 +13,10 @@ namespace Dao.Net.CClient {
 
         MySocketClient client;
 
-        ITerminalService terminal;
+        ITerminalService t;
+
+        ITerminalServcie2 terminal;
+
 
         int id;
 
@@ -30,32 +33,43 @@ namespace Dao.Net.CClient {
         internal void Init(MySocketClient client) {
             this.client = client;
 
-            terminal = client.Terminal;
+            terminal = client.serviceClientHandler
+                .GetServiceProxy<ITerminalServcie2>("terminal","0");
 
-            client.TerminalCallback.Receive += (idd, ss) => {
+            terminal.Received += Terminal2_Received;
+            terminal.Error += Terminal2_Error;
 
-                if (idd != id) return;
+            //terminal = client.Terminal;
 
-                textBox2.Text += ss + "\r\n";
+            //client.TerminalCallback.Receive += Terminal2_Received;
 
-                textBox2.Select(textBox2.Text.Length - 1, 0);
-                textBox2.ScrollToCaret();
-            };
+            //client.TerminalCallback.Error += Terminal2_Error;
+        }
 
-            client.TerminalCallback.Error += (idd, ss) => {
+        private void Terminal2_Error(int idd, string ss) {
+            if (idd != id) return;
 
-                if (idd != id) return;
+            textBox2.Text += ss + "\r\n";
 
-                textBox2.Text += ss + "\r\n";
+            textBox2.Select(textBox2.Text.Length - 1, 0);
+            textBox2.ScrollToCaret();
+        }
 
-                textBox2.Select(textBox2.Text.Length - 1, 0);
-                textBox2.ScrollToCaret();
-            };
+        private void Terminal2_Received(int idd, string ss) {
+            if (idd != id) return;
+
+            textBox2.Text += ss + "\r\n";
+
+            textBox2.Select(textBox2.Text.Length - 1, 0);
+            textBox2.ScrollToCaret();
         }
 
         private void button1_Click(object sender, EventArgs e) {
+            Execute();
+        }
 
-            terminal.Execute(id, textBox1.Text + "\r\n");
+        private void Execute() {
+            terminal.Execute(id, textBox1.Text + "\r\n" + "\r\n");
 
             textBox1.Text = "";
         }
@@ -63,6 +77,12 @@ namespace Dao.Net.CClient {
         protected override void OnClosed(EventArgs e) {
             base.OnClosed(e);
             terminal.Close(id);
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Enter) {
+                Execute();
+            }
         }
     }
 }

@@ -7,13 +7,10 @@ using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Proxies;
 using System.Text;
 
-namespace Dao.Net
-{
+namespace Dao.Net {
 
-    public class InvocationContext
-    {
-        public InvocationContext(MethodBase method, object[] arguments)
-        {
+    public class InvocationContext {
+        public InvocationContext(MethodBase method, object[] arguments) {
             Method = method;
             Arguments = arguments;
         }
@@ -22,37 +19,31 @@ namespace Dao.Net
         public object Return { get; set; }
     }
 
-    public abstract class BaseRealProxy : RealProxy
-    {
-        public BaseRealProxy(Type type)
-            : base(type)
-        {
+    public abstract class AbstractRealProxy : RealProxy {
+        public AbstractRealProxy(Type type)
+            : base(type) {
 
         }
 
         public abstract void OnInvoke(InvocationContext context);
 
-        public override IMessage Invoke(IMessage msg)
-        {
+        public override IMessage Invoke(IMessage msg) {
             var mcm = msg as IMethodCallMessage;
             var methodInfo = mcm.MethodBase as MethodInfo;
-            try
-            {
+            try {
                 //Console.WriteLine("Before");
                 InvocationContext context = new InvocationContext(mcm.MethodBase, mcm.InArgs);
                 OnInvoke(context);
                 //Console.WriteLine("After");
                 return new ReturnMessage(context.Return, null, 0, mcm.LogicalCallContext, mcm);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //Console.WriteLine("Exception");
                 return new ReturnMessage(ex, mcm);
             }
         }
     }
 
-    public class EventRealProxy : BaseRealProxy {
+    public class EventRealProxy : AbstractRealProxy {
 
         EventHandlerList handlers = new EventHandlerList();
 
@@ -62,7 +53,7 @@ namespace Dao.Net
 
         }
 
-        object GetHandlerKey(string name) {
+        protected object GetHandlerKey(string name) {
             object key;
 
             if (handlerKeys.TryGetValue(name, out key)) {
@@ -86,13 +77,13 @@ namespace Dao.Net
 
                 if (method.Name.StartsWith("add_")) {
 
-                    //发送给服务器
-
                     string name = method.Name.Replace("add_", "");
 
                     object key = GetHandlerKey(name);
 
                     handlers.AddHandler(key, context.Arguments[0] as Delegate);
+
+                    OnAddHandler(context, name, key);
 
                 } else if (method.Name.StartsWith("remove_")) {
 
@@ -102,15 +93,26 @@ namespace Dao.Net
                     object key = GetHandlerKey(name);
 
                     handlers.RemoveHandler(key, context.Arguments[0] as Delegate);
+
+                    OnRemoveHandler(context, name, key);
                 }
             } else {
                 OnInvokeMethod(context);
             }
         }
 
+        protected virtual void OnRemoveHandler(InvocationContext context,string name,object key) {
+
+        }
+
+        protected virtual void OnAddHandler(InvocationContext context, string name, object key) {
+
+        }
+
         protected virtual void OnInvokeMethod(InvocationContext context) {
 
         }
+
         public void Raise(string name, params object[] args) {
 
             object key = GetHandlerKey(name);
@@ -121,18 +123,15 @@ namespace Dao.Net
         }
     }
 
-    public class AspectRealProxy<T> : BaseRealProxy
-    {
+    public class AspectRealProxy<T> : AbstractRealProxy {
         public T Target { get; private set; }
 
         public AspectRealProxy(T target)
-            : base(typeof(T))
-        {
+            : base(typeof(T)) {
             Target = target;
         }
 
-        public override void OnInvoke(InvocationContext context)
-        {
+        public override void OnInvoke(InvocationContext context) {
             context.Return = context.Method.Invoke(Target, context.Arguments);
         }
 

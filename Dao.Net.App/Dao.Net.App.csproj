@@ -42,7 +42,9 @@
   <ItemGroup>
     <Compile Include="Calc.cs" />
     <Compile Include="ICalc2.cs" />
+    <Compile Include="ITerminalServcie2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ITerminalService.cs" />
     <Compile Include="Terminal.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

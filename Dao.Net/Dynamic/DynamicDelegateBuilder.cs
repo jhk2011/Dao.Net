@@ -68,8 +68,11 @@ namespace Dao.Net.Dynamic
         public object CreateObject(Type type, Action<object[]> action)
         {
             Type type2 = CreateType(type);
-            _assemblyBuilder.Save(FileName);
             return Activator.CreateInstance(type2, action);
+        }
+
+        public void Save() {
+            _assemblyBuilder.Save(FileName);
         }
 
         public Delegate CreateDelegate(Type type, Action<object[]> action)
@@ -101,15 +104,16 @@ namespace Dao.Net.Dynamic
 
             for (int i = 0; i < parameters.Length; i++)
             {
+                var parameter = parameters[i];
+
                 il.Emit(OpCodes.Dup);
 
                 il.Emit(OpCodes.Ldc_I4, i);
-                //il.Emit(OpCodes.Ldc_I4, i + 1);
                 il.Emit(OpCodes.Ldarg, i + 1);
 
-                if (parameters[i].IsValueType)
+                if (parameter.IsValueType)
                 {
-                    il.Emit(OpCodes.Box, parameters[i]);
+                    il.Emit(OpCodes.Box, parameter);
                 }
 
                 il.Emit(OpCodes.Stelem_Ref);

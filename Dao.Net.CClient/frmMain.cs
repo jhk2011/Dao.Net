@@ -77,12 +77,27 @@ namespace Dao.Net.CClient {
 
             var result = calc2.Add(100, 200);
 
+            Console.WriteLine(result);
+
             calc2.Added -= Calc2_Added;
 
         }
 
         private void Calc2_Added(string s) {
-            Console.WriteLine("Calc2.Added" + s);
+            Console.WriteLine("Calc2.Added:" + s);
+        }
+
+        private void button7_Click(object sender, EventArgs e) {
+
+            ICalc2 calc2 = client.serviceClientHandler.GetServiceProxy<ICalc2>("calc2","0");
+
+            calc2.Added += Calc2_Added;
+
+            var result = calc2.Add(100, 200);
+
+            Console.WriteLine(result);
+
+            calc2.Added -= Calc2_Added;
         }
     }
 }

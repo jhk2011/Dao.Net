@@ -32,6 +32,19 @@ namespace Dao.Net {
             }
         }
 
+        protected override void OnAddHandler(InvocationContext context, string name, object key) {
+            ServiceHandler.Subscribe(new Subscribe {
+                Id = Guid.NewGuid(),
+                Name = ServiceName,
+                Action = name,
+                DestUserId = UserId
+            });
+        }
+
+        protected override void OnRemoveHandler(InvocationContext context, string name, object key) {
+
+        }
+
         protected override void OnInvokeMethod(InvocationContext context) {
 
             var method = context.Method as MethodInfo;
