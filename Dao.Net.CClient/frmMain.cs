@@ -89,7 +89,7 @@ namespace Dao.Net.CClient {
 
         private void button7_Click(object sender, EventArgs e) {
 
-            ICalc2 calc2 = client.serviceClientHandler.GetServiceProxy<ICalc2>("calc2","0");
+            ICalc2 calc2 = client.serviceClientHandler.GetServiceProxy<ICalc2>("calc2", "0");
 
             calc2.Added += Calc2_Added;
 
@@ -98,6 +98,12 @@ namespace Dao.Net.CClient {
             Console.WriteLine(result);
 
             calc2.Added -= Calc2_Added;
+        }
+
+        private async void button8_Click(object sender, EventArgs e) {
+            while (true) {
+                await client.SendAsync(new byte[1024000]);
+            }
         }
     }
 }

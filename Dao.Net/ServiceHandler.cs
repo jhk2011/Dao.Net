@@ -136,23 +136,32 @@ namespace Dao.Net {
     public class ServiceDef {
         public Func<object> ServiceLoader { get; set; }
         public Dictionary<string, ServiceInstance> Instances { get; set; }
-        public string Name { get; internal set; }
+        public string Name { get; set; }
     }
 
     public class ServiceInstance {
         public string Id { get; set; }
         public object Service { get; set; }
+
+        /// <summary>
+        /// 是否是动态创建的服务
+        /// </summary>
+        public bool Dynamic { get; set; }
     }
 
     public class ServiceHandler : SocketHandler {
 
         public override void Close(HandleContext context) {
             foreach (var def in serviceDefs) {
-                foreach (var instance in def.Value.Instances) {
-                    var dispose = instance.Value.Service as IDisposable;
 
-                    if (dispose != null) {
-                        dispose.Dispose();
+                foreach (var instance in def.Value.Instances.ToList()) {
+
+                    if (instance.Value.Dynamic) {
+                        var dispose = instance.Value.Service as IDisposable;
+                        if (dispose != null) {
+                            dispose.Dispose();
+                        }
+                        def.Value.Instances.Remove(instance.Key);
                     }
                 }
             }
@@ -211,13 +220,16 @@ namespace Dao.Net {
                 Instances = new Dictionary<string, ServiceInstance> {
                     [instance] = new ServiceInstance {
                         Id = instance,
-                        Service = service
+                        Service = service,
+                        Dynamic = false
                     }
                 },
                 Name = name
             };
 
             serviceDefs.Add(name, def);
+
+            //TODO 默认自动注册  需要客户端请求注册
 
             AddEventHandler(name, service, instance);
         }
@@ -266,7 +278,8 @@ namespace Dao.Net {
 
                     instance = new ServiceInstance {
                         Id = instanceId,
-                        Service = service
+                        Service = service,
+                        Dynamic = true
                     };
 
                     def.Instances.Add(instanceId, instance);

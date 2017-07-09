@@ -54,8 +54,10 @@ namespace Dao.Net {
 
             if (session != null) {
 
-                if (!sessions.ContainsKey(session)) {
-                    sessions.Add(session, null);
+                lock (sessions) {
+                    if (!sessions.ContainsKey(session)) {
+                        sessions.Add(session, null);
+                    }
                 }
 
                 await session.SendAsync(transfer);
@@ -124,7 +126,7 @@ namespace Dao.Net {
                         Session = session,
                         Packet = packet
                     });
-                    
+
                 }
             }
 

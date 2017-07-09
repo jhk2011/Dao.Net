@@ -55,6 +55,8 @@ namespace Dao.Net.Web {
 
             string url = request.Line.Split(new char[] { ' ' })[1];
 
+            url = System.Web.HttpUtility.UrlDecode(url);
+
             string root = @"D:\";
 
             string path = Path.Combine(root, url.TrimStart('/'));
@@ -74,9 +76,15 @@ namespace Dao.Net.Web {
                 s += "</ul>";
             } else if (File.Exists(path)) {
 
-                response.Body = File.ReadAllBytes(path);
-                string ext = Path.GetExtension(path);
-                contentType = MimeType.GetMimeType(ext) ?? "application/octet-stream";
+                FileInfo fi = new FileInfo(path);
+
+                if (fi.Length > 1024 * 1024 * 1024) {
+                     s = "文件过大";
+                } else {
+                    response.Body = File.ReadAllBytes(path);
+                    string ext = Path.GetExtension(path);
+                    contentType = MimeType.GetMimeType(ext) ?? "application/octet-stream";
+                }
             } else {
                 s = "文件或路径不存在";
             }
